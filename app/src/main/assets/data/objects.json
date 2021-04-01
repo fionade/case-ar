@@ -1,0 +1,1204 @@
+{
+  "objects": [
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Apfel"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Apfel"
+      },
+      "accusative": {
+        "article": "den",
+        "noun": "Apfel"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Backofen"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Backofen"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Backofen"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Bär"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Bär"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Bär"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Baseballhandschuh"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Baseballhandschuh"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Baseballhandschuh"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Baseballschläger"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Baseballschläger"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Baseballschläger"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Brokkoli"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Brokkoli"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Brokkoli"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Bus"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Bus"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Bus"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Drachen"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Drachen"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Drachen"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Elefant"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Elefant"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Elefant"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Esstisch"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Esstisch"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Esstisch"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Fernseher"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Fernseher"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Fernseher"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Fön"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Fön"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Fön"
+      },
+      "verb": "liegt"
+    },
+    {
+    "nominative": {
+      "article": "der",
+      "noun" : "Hot Dog"
+    },
+    "dative": {
+      "article": "dem",
+      "noun" : "Hot Dog"
+    },
+    "accusative": {
+      "article": "den",
+      "noun" : "Hot Dog"
+    },
+    "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Hund"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Hund"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Hund"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Hydrant"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Hydrant"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Hydrant"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Koffer"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Koffer"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Koffer"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Krapfen"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Krapfen"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Krapfen"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Kuchen"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Kuchen"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Kuchen"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Kühlschrank"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Kühlschrank"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Kühlschrank"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Laptop"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Laptop"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Laptop"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "LKW"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "LKW"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "LKW"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Löffel"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Löffel"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Löffel"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Regenschirm"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Regenschirm"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Regenschirm"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Rucksack"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Rucksack"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Rucksack"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Ski"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Ski"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Ski"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Sportball"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Sportball"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Sportball"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Teddybär"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Teddybär"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Teddybär"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Tennisschläger"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Tennisschläger"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Tennisschläger"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Toaster"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Toaster"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Toaster"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Vogel"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Vogel"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Vogel"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "der",
+        "noun" : "Zug"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Zug"
+      },
+      "accusative": {
+        "article": "den",
+        "noun" : "Zug"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Ampel"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Ampel"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Ampel"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Banane"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Banane"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Banane"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Bank"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Bank"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Bank"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Couch"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Couch"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Couch"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Fernbedienung"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Fernbedienung"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Fernbedienung"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Flasche"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Flasche"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Flasche"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Gabel"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Gabel"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Gabel"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Giraffe"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Giraffe"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Giraffe"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Handtasche"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Handtasche"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Handtasche"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Karotte"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Karotte"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Karotte"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Katze"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Katze"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Katze"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Krawatte"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Krawatte"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Krawatte"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Kuh"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Kuh"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Kuh"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Maus"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Maus"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Maus"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Mikrowelle"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Mikrowelle"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Mikrowelle"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Orange"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Orange"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Orange"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Parkuhr"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Parkuhr"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Parkuhr"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Person"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Person"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Person"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Pizza"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Pizza"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Pizza"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Schere"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Schere"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Schere"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Schüssel"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Schüssel"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Schüssel"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Spüle"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Spüle"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Spüle"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Tasse"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Tasse"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Tasse"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Tastatur"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Tastatur"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Tastatur"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Topfpflanze"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Topfpflanze"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Topfpflanze"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Uhr"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Uhr"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Uhr"
+      },
+      "verb": "hängt"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Vase"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Vase"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Vase"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "die",
+        "noun" : "Zahnbürste"
+      },
+      "dative": {
+        "article": "der",
+        "noun" : "Zahnbürste"
+      },
+      "accusative": {
+        "article": "die",
+        "noun" : "Zahnbürste"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Auto"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Auto"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Auto"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Bad"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Bad"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Bad"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Bett"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Bett"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Bett"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Boot"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Boot"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Boot"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Buch"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Buch"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Buch"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Fahrrad"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Fahrrad"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Fahrrad"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Fleisch"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Fleisch"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Fleisch"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Flugzeug"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Flugzeug"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Flugzeug"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Frisbee"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Frisbee"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Frisbee"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Handy"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Handy"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Handy"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Messer"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Messer"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Messer"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Motorrad"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Motorrad"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Motorrad"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Pferd"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Pferd"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Pferd"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Sandwich"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Sandwich"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Sandwich"
+      },
+      "verb": "liegt"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Schaf"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Schaf"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Schaf"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Skateboard"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Skateboard"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Skateboard"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Snowboard"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Snowboard"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Snowboard"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Stoppschild"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Stoppschild"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Stoppschild"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Surfbrett"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Surfbrett"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Surfbrett"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Weinglas"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Weinglas"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Weinglas"
+      },
+      "verb": "steht"
+    },
+    {
+      "nominative": {
+        "article": "das",
+        "noun" : "Zebra"
+      },
+      "dative": {
+        "article": "dem",
+        "noun" : "Zebra"
+      },
+      "accusative": {
+        "article": "das",
+        "noun" : "Zebra"
+      },
+      "verb": "steht"
+    }
+  ]
+}

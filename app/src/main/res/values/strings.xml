@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CaseAR</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="contact"><![CDATA[<a href=\"mailto:fiona.draxler@ifi.lmu.de\">Send an email</a>]]></string>
+    <string name="privacy">The Case AR app requires the Android permission CAMERA in order to show a camera preview and to perform object detection. All computations are performed on the device itself. We do not store the camera data or any other personal data and we do not transfer them to any other location.</string>
+    <string name="close">Close</string>
+    <string name="privacyTitle">Data Privacy Statement</string>
+    <string name="contactTitle">Help and Contact</string>
+</resources>
