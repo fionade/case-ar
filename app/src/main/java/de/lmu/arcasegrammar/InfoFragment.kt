@@ -40,10 +40,6 @@ class InfoFragment: Fragment() {
             root.contact.text = Html.fromHtml(getString(R.string.contact))
         }
 
-        root.closeInfo.setOnClickListener {
-            activity?.onBackPressed()
-        }
-
         root.isClickable = true
 
         return root

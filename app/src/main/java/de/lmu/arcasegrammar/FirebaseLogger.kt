@@ -15,10 +15,6 @@
  */
 package de.lmu.arcasegrammar
 
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import de.lmu.arcasegrammar.model.LogEntry
-
 class FirebaseLogger {
 
     companion object {

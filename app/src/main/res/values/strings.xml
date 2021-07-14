@@ -6,4 +6,6 @@
     <string name="close">Close</string>
     <string name="privacyTitle">Data Privacy Statement</string>
     <string name="contactTitle">Help and Contact</string>
+    <string name="info_title">Info</string>
+    <string name="camera">Camera</string>
 </resources>
