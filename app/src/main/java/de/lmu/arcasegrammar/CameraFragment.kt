@@ -10,10 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getColorStateList
@@ -105,7 +102,12 @@ class CameraFragment: Fragment() {
 
         // Preview setup
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity?.window?.insetsController?.hide(WindowInsets.Type.statusBars())
+        }
+        else {
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
 
         // Quiz logic setup
         sentenceManager = SentenceManager(requireContext())

@@ -17,9 +17,8 @@ package de.lmu.arcasegrammar.sentencebuilder
 
 import android.content.Context
 import de.lmu.arcasegrammar.model.DetectedObject
-import kotlinx.serialization.UnstableDefault
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
@@ -36,7 +35,6 @@ class SentenceManager {
     private val objects = mutableMapOf<String, Word>()
     // test: objects.isInitalized
 
-    @OptIn(UnstableDefault::class)
     constructor(context: Context) {
         // loading data from assets
         // only do this once to avoid file system access
@@ -44,11 +42,10 @@ class SentenceManager {
         val objectString: String
         try {
             objectString = context.assets.open("data/objects.json").bufferedReader().use { it.readText() }
-            val json = Json(JsonConfiguration.Default)
             val jsonObject = JSONObject(objectString)
             val sentenceObject = jsonObject.getJSONArray("objects")
             for (i in 0 until sentenceObject.length()) {
-                val word = json.parse(Word.serializer(), sentenceObject[i].toString())
+                val word = Json.decodeFromString<Word>(sentenceObject[i].toString())
                 this.objects[word.nominative.noun] = word
             }
         }
