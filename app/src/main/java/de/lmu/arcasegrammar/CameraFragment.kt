@@ -255,9 +255,16 @@ class CameraFragment: Fragment() {
                                         val location = item.location
 
                                         // use inverse scaling for the portrait view (landscape camera)
-                                        // TODO: this is not correct yet!
-                                        button.x = location.centerX() / cropSize * previewHeight
-                                        button.y = location.centerY() / cropSize * previewWidth
+                                        // adjust for center cropping
+                                        val minDimension = previewWidth.coerceAtMost(previewHeight)
+                                        button.x =
+                                            (minDimension - location.centerY() / cropSize * minDimension).coerceAtMost(
+                                                (minDimension - button.width).toFloat()
+                                            )
+                                        button.y =
+                                            (location.centerX() / cropSize * minDimension + (previewWidth.coerceAtLeast(previewHeight) - minDimension) / 2).coerceAtMost(
+                                                (minDimension - button.height).toFloat()
+                                            )
                                         // cropToFrameTransform.mapRect(location)
 
                                         binding.labelContainer.addView(button)
