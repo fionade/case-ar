@@ -21,15 +21,21 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import de.lmu.arcasegrammar.databinding.FragmentCameraBinding
 import de.lmu.arcasegrammar.model.DetectedObject
+import de.lmu.arcasegrammar.model.HistoryDatabase
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
+import de.lmu.arcasegrammar.sentencebuilder.SentenceDao
 import de.lmu.arcasegrammar.sentencebuilder.SentenceManager
 import de.lmu.arcasegrammar.tensorflow.YuvToRgbConverter
 import de.lmu.arcasegrammar.tensorflow.tflite.Classifier
 import de.lmu.arcasegrammar.tensorflow.tflite.TFLiteObjectDetectionAPIModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.*
@@ -88,6 +94,9 @@ class CameraFragment: Fragment() {
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
 
+    // History in Room database
+    private lateinit var sentenceDao: SentenceDao
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -141,6 +150,8 @@ class CameraFragment: Fragment() {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        sentenceDao = HistoryDatabase.getDatabase(requireContext()).sentenceDao()
 
         return view
     }
@@ -347,6 +358,10 @@ class CameraFragment: Fragment() {
         // test: try with one fixed sentence
         sentence = sentenceManager.constructSentence(firstObject!!, secondObject!!)
 
+        lifecycleScope.launch(Dispatchers.IO) {
+            sentenceDao.insertSentence(sentence)
+        }
+
         binding.part1.text = sentence.firstPart
         binding.part2.text = sentence.secondPart
 
@@ -421,6 +436,11 @@ class CameraFragment: Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private inner class ObjectAnalyzer(private val listener: ObjectListener): ImageAnalysis.Analyzer {

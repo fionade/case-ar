@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_camera" />
 
     <fragment
+        android:id="@+id/navigation_history"
+        android:name="de.lmu.arcasegrammar.HistoryFragment"
+        android:label="@string/history_title"
+        tools:layout="@layout/fragment_history" />
+
+    <fragment
         android:id="@+id/navigation_info"
         android:name="de.lmu.arcasegrammar.InfoFragment"
         android:label="@string/info_title"

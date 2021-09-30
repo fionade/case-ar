@@ -7,6 +7,11 @@
         android:title="@string/camera" />
 
     <item
+        android:id="@+id/navigation_history"
+        android:icon="@drawable/ic_outline_history_24"
+        android:title="@string/history_title" />
+
+    <item
         android:id="@+id/navigation_info"
         android:icon="@drawable/ic_outline_info_24"
         android:title="@string/info_title" />

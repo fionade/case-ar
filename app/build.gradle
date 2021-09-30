@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-kapt'
 //apply plugin: 'com.google.gms.google-services'
 
 android {
@@ -42,6 +43,7 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+
     }
 }
 
@@ -64,13 +66,22 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:1.0-M1-1.4.0-rc"
 
-    def camerax_version = "1.0.0"
+    def camerax_version = "1.0.2"
     // CameraX core library using camera2 implementation
     implementation "androidx.camera:camera-camera2:$camerax_version"
     // CameraX Lifecycle Library
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     // CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha26"
+
+    def room_version = "2.3.0"
+    // Room components
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+
+    implementation 'com.google.code.gson:gson:2.8.6'
+
 
 //    implementation 'com.google.firebase:firebase-database-ktx:19.4.0'
 }

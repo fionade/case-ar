@@ -35,7 +35,7 @@ class InfoFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_info, container, false)
+        _binding = FragmentInfoBinding.inflate(inflater, container, false)
 
         if (Build.VERSION.SDK_INT >= 24) {
             binding.contact.text = Html.fromHtml(getString(R.string.contact), Html.FROM_HTML_MODE_COMPACT)
@@ -44,8 +44,13 @@ class InfoFragment: Fragment() {
             binding.contact.text = Html.fromHtml(getString(R.string.contact))
         }
 
-        root.isClickable = true
+        binding.root.isClickable = true
 
-        return root
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

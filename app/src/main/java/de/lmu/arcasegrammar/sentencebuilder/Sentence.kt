@@ -15,9 +15,31 @@
  */
 package de.lmu.arcasegrammar.sentencebuilder
 
-data class Sentence(val firstPart: String, val wordToChoose: String, val secondPart: String, val distractors: ArrayList<String>) {
+import androidx.room.*
+
+@Entity
+data class Sentence(val firstPart: String,
+                    val wordToChoose: String,
+                    val secondPart: String,
+                    val distractors: ArrayList<String>,
+                    @PrimaryKey(autoGenerate = true) var id: Long = -1) {
 
     fun stringify(): String {
         return "%s %s %s.".format(firstPart, wordToChoose, secondPart)
     }
+
+    fun stringifyWithPlaceholder(): String {
+        return "%s ... %s.".format(firstPart, secondPart)
+    }
+}
+
+@Dao
+interface SentenceDao {
+
+    @Query("SELECT * FROM sentence ORDER BY id DESC")
+    suspend fun getAllSentences(): List<Sentence>
+
+    @Insert
+    suspend fun insertSentence(sentence: Sentence)
+
 }
