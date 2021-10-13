@@ -73,6 +73,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        firebaseLogger.addLogMessage("app_resumed")
+        super.onResume()
+    }
+
     override fun onPause() {
         firebaseLogger.addLogMessage("app_paused")
         super.onPause()

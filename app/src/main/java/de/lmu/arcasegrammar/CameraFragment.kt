@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Fiona Draxler, Elena Wallwitz. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package de.lmu.arcasegrammar
 
 import android.Manifest
@@ -55,7 +71,7 @@ class CameraFragment: Fragment() {
         private const val PERMISSION_CAMERA = Manifest.permission.CAMERA
 
         // Tensorflow minimum confidence for displaying label
-        const val MINIMUM_CONFIDENCE_OBJECT_DETECTION = 0.65f
+        const val MINIMUM_CONFIDENCE_OBJECT_DETECTION = 0.55f
         const val SHOW_LABEL_DURATION = 5000L
     }
 
@@ -137,7 +153,7 @@ class CameraFragment: Fragment() {
             startCamera()
 
             try {
-                detector = TFLiteObjectDetectionAPIModel.create(activity?.assets, "tensorflow/detect.tflite", "tensorflow/labelmap.txt", cropSize, true)
+                detector = TFLiteObjectDetectionAPIModel.create(activity?.assets, "tensorflow/open_images_uint8.tflite", "tensorflow/open_images_labelmap_de.txt", cropSize, false)
                 croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Bitmap.Config.ARGB_8888)
             }
             catch (e: IOException) {
@@ -210,9 +226,6 @@ class CameraFragment: Fragment() {
                     it.setSurfaceProvider(binding.previewView.surfaceProvider)
                 }
 
-            previewWidth = binding.previewView.width
-            previewHeight = binding.previewView.height
-
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setTargetResolution(Size(cropSize, cropSize))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -267,6 +280,10 @@ class CameraFragment: Fragment() {
 
                                         // use inverse scaling for the portrait view (landscape camera)
                                         // adjust for center cropping
+                                        if (previewWidth == 0 || previewHeight == 0) {
+                                            previewWidth = binding.previewView.width
+                                            previewHeight = binding.previewView.height
+                                        }
                                         val minDimension = previewWidth.coerceAtMost(previewHeight)
                                         button.x =
                                             (minDimension - location.centerY() / cropSize * minDimension).coerceAtMost(
@@ -352,27 +369,36 @@ class CameraFragment: Fragment() {
 
     private fun showQuiz() {
 
-        binding.firstSelectedLabel.visibility = View.GONE
-        binding.quizContainer.visibility = View.VISIBLE
+        val constructedSentence = sentenceManager.constructSentence(firstObject!!, secondObject!!)
+        if (constructedSentence != null) {
 
-        // test: try with one fixed sentence
-        sentence = sentenceManager.constructSentence(firstObject!!, secondObject!!)
+            binding.firstSelectedLabel.visibility = View.GONE
+            binding.quizContainer.visibility = View.VISIBLE
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            sentenceDao.insertSentence(sentence)
+            sentence = constructedSentence!!
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                sentenceDao.insertSentence(sentence)
+            }
+
+            binding.part1.text = sentence.firstPart
+            binding.part2.text = sentence.secondPart
+
+            binding.option1.text = sentence.distractors[0]
+            binding.option2.text = sentence.distractors[1]
+            binding.option3.text = sentence.distractors[2]
+
+            binding.solution.text = sentence.wordToChoose
+            quizShown = true
+
+            firebaseLogger.addLogMessage("show_quiz", sentence.stringify())
+        }
+        else {
+            Snackbar.make(binding.root, getString(R.string.error_quiz_creation), Snackbar.LENGTH_SHORT).show()
+            firebaseLogger.addLogMessage("error_crating_quiz", "${firstObject!!.name} and ${secondObject!!.name}")
         }
 
-        binding.part1.text = sentence.firstPart
-        binding.part2.text = sentence.secondPart
 
-        binding.option1.text = sentence.distractors[0]
-        binding.option2.text = sentence.distractors[1]
-        binding.option3.text = sentence.distractors[2]
-
-        binding.solution.text = sentence.wordToChoose
-        quizShown = true
-
-        firebaseLogger.addLogMessage("show_quiz", sentence.stringify())
     }
 
     private fun resetQuiz() {
@@ -413,7 +439,7 @@ class CameraFragment: Fragment() {
                 firebaseLogger.addLogMessage("answer_selected", "correct: ${sentence.wordToChoose}")
 
                 binding.quizContainer.postDelayed({
-                    if (binding.solution.visibility == View.VISIBLE) {
+                    if (_binding?.solution?.visibility == View.VISIBLE) {
                         resetQuiz()
                     }
                 }, 3000) // hide quiz 3 seconds after a correct answer

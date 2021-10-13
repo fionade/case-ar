@@ -22,7 +22,7 @@ data class Sentence(val firstPart: String,
                     val wordToChoose: String,
                     val secondPart: String,
                     val distractors: ArrayList<String>,
-                    @PrimaryKey(autoGenerate = true) var id: Long = -1) {
+                    @PrimaryKey(autoGenerate = true) var id: Long = 0) {
 
     fun stringify(): String {
         return "%s %s %s.".format(firstPart, wordToChoose, secondPart)

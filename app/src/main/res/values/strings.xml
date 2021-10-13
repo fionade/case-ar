@@ -9,4 +9,5 @@
     <string name="info_title">Info</string>
     <string name="camera">Camera</string>
     <string name="history_title">History</string>
+    <string name="error_quiz_creation">Error while creating quiz</string>
 </resources>

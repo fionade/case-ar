@@ -25,7 +25,9 @@ import java.io.IOException
 import kotlin.math.abs
 import kotlin.random.Random
 
-class SentenceManager {
+class SentenceManager// loading data from assets
+// only do this once to avoid file system access
+    (context: Context) {
 
     companion object {
         const val NUMBER_OF_DISTRACTORS = 2
@@ -35,13 +37,10 @@ class SentenceManager {
     private val objects = mutableMapOf<String, Word>()
     // test: objects.isInitalized
 
-    constructor(context: Context) {
-        // loading data from assets
-        // only do this once to avoid file system access
-
+    init {
         val objectString: String
         try {
-            objectString = context.assets.open("data/objects.json").bufferedReader().use { it.readText() }
+            objectString = context.assets.open("data/open_images_objects.json").bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(objectString)
             val sentenceObject = jsonObject.getJSONArray("objects")
             for (i in 0 until sentenceObject.length()) {
@@ -55,31 +54,33 @@ class SentenceManager {
         catch (jsonException: JSONException) {
             jsonException.printStackTrace()
         }
-
     }
 
-    fun constructSentence(firstItem: DetectedObject, secondItem: DetectedObject) : Sentence {
+    fun constructSentence(firstItem: DetectedObject, secondItem: DetectedObject) : Sentence? {
 
         // compute position of objects to get preposition
         val xDiff = firstItem.location.x - secondItem.location.x
         val xDescription = if (xDiff > 0) "rechts von" else "links von"
 
         val yDiff = firstItem.location.y - firstItem.location.y
-        var yDescription = if (yDiff > 0) "vor" else "hinter"
+        val yDescription = if (yDiff > 0) "vor" else "hinter"
 
         val position = if (abs(xDiff) > 0.8 * abs(yDiff)) xDescription else yDescription
 
-        val firstWord = objects.getValue(firstItem.name)
-        val secondWord = objects.getValue(secondItem.name)
+        if(objects.containsKey(firstItem.name) && objects.containsKey(firstItem.name)) {
+            val firstWord = objects.getValue(firstItem.name)
+            val secondWord = objects.getValue(secondItem.name)
 
-        // randomly select an accusative or dative sentence
-        return if (Random.nextFloat() > 0.5) {
-            // return sentence
-            createAccusativeSentence(firstWord, secondWord, position)
-        } else {
-            createDativeSentence(firstWord, secondWord, position)
+            // randomly select an accusative or dative sentence
+            return if (Random.nextFloat() > 0.5) {
+                // return sentence
+                createAccusativeSentence(firstWord, secondWord, position.replace("von", "neben"))
+            } else {
+                createDativeSentence(firstWord, secondWord, position)
+            }
         }
 
+        return null
     }
 
 

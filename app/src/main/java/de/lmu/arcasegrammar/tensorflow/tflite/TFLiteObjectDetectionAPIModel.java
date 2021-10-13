@@ -107,7 +107,7 @@ public class TFLiteObjectDetectionAPIModel implements Classifier {
 
     InputStream labelsInput = null;
     // TODO dynamic paths
-    labelsInput = assetManager.open("tensorflow/labelmap.txt");
+    labelsInput = assetManager.open(labelFilename);
     BufferedReader br = null;
     br = new BufferedReader(new InputStreamReader(labelsInput));
     String line;
@@ -205,7 +205,8 @@ public class TFLiteObjectDetectionAPIModel implements Classifier {
       // SSD Mobilenet V1 Model assumes class 0 is background class
       // in label file and class labels start from 1 to number_of_classes+1,
       // while outputClasses correspond to class index from 0 to number_of_classes
-      int labelOffset = 1;
+//      int labelOffset = 1;
+      int labelOffset = 0;
       recognitions.add(
           new Recognition(
               "" + i,
