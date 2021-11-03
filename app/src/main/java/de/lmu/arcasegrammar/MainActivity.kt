@@ -16,17 +16,11 @@
 
 package de.lmu.arcasegrammar
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.*
@@ -66,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         // set layout
         setContentView(R.layout.activity_main)
 
+        // Set up navigation
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         navController = navHostFragment.navController
         findViewById<BottomNavigationView>(R.id.nav_view)

@@ -37,10 +37,11 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
+import com.google.common.util.concurrent.ListenableFuture
 import de.lmu.arcasegrammar.databinding.FragmentCameraBinding
 import de.lmu.arcasegrammar.model.DetectedObject
 import de.lmu.arcasegrammar.model.HistoryDatabase
@@ -84,7 +85,7 @@ class CameraFragment: Fragment() {
     private lateinit var optionList: Array<RadioButton>
 
     // Tensorflow setup
-    protected lateinit var detector: Classifier
+    private lateinit var detector: Classifier
     private var computingDetection = false
     private lateinit var croppedBitmap: Bitmap
     // list to track times where objects first appeared
@@ -94,9 +95,8 @@ class CameraFragment: Fragment() {
     private val cropSize = 300
 
     // Camera setup
-    private var previewWidth: Int = 0
+    private var previewWidth = 0
     private var previewHeight = 0
-    protected var rgbBytes: IntArray? = null
 
     // CameraX setup
     private lateinit var cameraExecutor: ExecutorService
@@ -117,13 +117,14 @@ class CameraFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCameraBinding.inflate(inflater, container, false)
         val view = binding.root
 
         // Firebase logging
         firebaseLogger = FirebaseLogger.getInstance()
         firebaseLogger.addLogMessage("opened_camera")
+
 
         // Preview setup
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -134,19 +135,23 @@ class CameraFragment: Fragment() {
             activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
 
-        // Quiz logic setup
-        sentenceManager = SentenceManager(requireContext())
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         // View setup
         binding.firstSelectedLabel.setOnCloseIconClickListener {
             resetQuiz()
         }
 
+        // Quiz logic setup
+        sentenceManager = SentenceManager(requireContext())
+
         optionList = arrayOf(binding.option1, binding.option2, binding.option3)
         optionList.forEach { it -> it.setOnClickListener {
             onOptionSelected(it)
         } }
-
 
         // check camera permission
         if (hasPermission()) {
@@ -169,7 +174,8 @@ class CameraFragment: Fragment() {
 
         sentenceDao = HistoryDatabase.getDatabase(requireContext()).sentenceDao()
 
-        return view
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun hasPermission(): Boolean {
@@ -215,129 +221,7 @@ class CameraFragment: Fragment() {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
-        cameraProviderFuture.addListener(Runnable {
-            // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(binding.previewView.surfaceProvider)
-                }
-
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .setTargetResolution(Size(cropSize, cropSize))
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, ObjectAnalyzer { results ->
-                        val mappedRecognitions = LinkedList<Classifier.Recognition>()
-
-                        for (result in results ) {
-                            val location = result.location
-                            if (location != null && result.confidence >= MINIMUM_CONFIDENCE_OBJECT_DETECTION) {
-                                Log.i(MainActivity.TAG, "Found object: %s, confidence: %s".format(result.title, result.confidence))
-                                mappedRecognitions.add(result)
-                            }
-                        }
-
-                        computingDetection = false
-
-                        activity?.runOnUiThread {
-
-                            // recreate with new items
-                            for (item in mappedRecognitions) {
-                                if (preparationList.containsKey(item.title) && preparationList[item.title]!! > 800) {
-                                    if (!labelList.containsKey(item.title)) {
-
-                                        val button = Chip(requireActivity()).apply {
-                                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                                            text = item.title
-                                            if (Build.VERSION.SDK_INT >= 23) {
-                                                chipBackgroundColor = getColorStateList(
-                                                    requireActivity(),
-                                                    R.color.chip_states
-                                                )
-                                            } else {
-                                                setChipBackgroundColorResource(R.color.quizBackground)
-                                            }
-                                            // TODO else?
-
-                                            isCheckable = true
-
-                                            if (firstObject?.name == item.title || secondObject?.name == item.title) {
-                                                isChecked = true
-
-                                                if (Build.VERSION.SDK_INT < 23) {
-                                                    setChipBackgroundColorResource(R.color.backgroundSelected)
-                                                }
-                                            }
-                                        }
-
-                                        // map the object location from the cropped frame to the full camera preview
-                                        val location = item.location
-
-                                        // use inverse scaling for the portrait view (landscape camera)
-                                        // adjust for center cropping
-                                        if (previewWidth == 0 || previewHeight == 0) {
-                                            previewWidth = binding.previewView.width
-                                            previewHeight = binding.previewView.height
-                                        }
-                                        val minDimension = previewWidth.coerceAtMost(previewHeight)
-                                        button.x =
-                                            (minDimension - location.centerY() / cropSize * minDimension).coerceAtMost(
-                                                (minDimension - button.width).toFloat()
-                                            )
-                                        button.y =
-                                            (location.centerX() / cropSize * minDimension + (previewWidth.coerceAtLeast(previewHeight) - minDimension) / 2).coerceAtMost(
-                                                (minDimension - button.height).toFloat()
-                                            )
-                                        // cropToFrameTransform.mapRect(location)
-
-                                        binding.labelContainer.addView(button)
-                                        labelList[item.title] = button
-                                        button.setOnClickListener {
-                                            onLabelSelected(item.title, button.x, button.y)
-                                            button.isChecked = true
-
-                                            if (Build.VERSION.SDK_INT < 23) {
-                                                button.setChipBackgroundColorResource(R.color.backgroundSelected)
-                                            }
-                                        }
-                                        button.postDelayed({
-                                            // only show the label for SHOW_LABEL_DURATION milliseconds
-                                            labelList.remove(item.title)
-                                            (button.parent as ViewGroup).removeView(button)
-                                            preparationList.remove(item.title)
-                                        }, SHOW_LABEL_DURATION)
-                                    }
-                                } else {
-                                    preparationList[item.title] = System.currentTimeMillis()
-                                }
-                            }
-                        }
-                    })
-                }
-
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            converter = YuvToRgbConverter(requireContext())
-
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalyzer)
-
-            } catch(exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
-            }
-
-        }, ContextCompat.getMainExecutor(requireContext()))
+        cameraProviderFuture.addListener(CameraRunnable(cameraProviderFuture, this), ContextCompat.getMainExecutor(requireContext()))
     }
 
     private fun onLabelSelected(text: String, x: Float, y: Float) {
@@ -375,7 +259,7 @@ class CameraFragment: Fragment() {
             binding.firstSelectedLabel.visibility = View.GONE
             binding.quizContainer.visibility = View.VISIBLE
 
-            sentence = constructedSentence!!
+            sentence = constructedSentence
 
             lifecycleScope.launch(Dispatchers.IO) {
                 sentenceDao.insertSentence(sentence)
@@ -395,7 +279,7 @@ class CameraFragment: Fragment() {
         }
         else {
             Snackbar.make(binding.root, getString(R.string.error_quiz_creation), Snackbar.LENGTH_SHORT).show()
-            firebaseLogger.addLogMessage("error_crating_quiz", "${firstObject!!.name} and ${secondObject!!.name}")
+            firebaseLogger.addLogMessage("error_creating_quiz", "${firstObject!!.name} and ${secondObject!!.name}")
         }
 
 
@@ -428,7 +312,7 @@ class CameraFragment: Fragment() {
         }
     }
 
-    fun onOptionSelected(view: View) {
+    private fun onOptionSelected(view: View) {
         val checked = (view as RadioButton).isChecked
 
         if (checked) {
@@ -469,14 +353,159 @@ class CameraFragment: Fragment() {
         _binding = null
     }
 
+    private inner class CameraRunnable(private val cameraProviderFuture: ListenableFuture<ProcessCameraProvider>, private val lifecycleOwner: LifecycleOwner) : Runnable {
+        override fun run() {
+            // Used to bind the lifecycle of cameras to the lifecycle owner
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            // Preview
+            val preview = Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider(binding.previewView.surfaceProvider)
+                }
+
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .setTargetResolution(Size(cropSize, cropSize))
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+                .also {
+                    it.setAnalyzer(cameraExecutor, ObjectAnalyzer { results ->
+                        val mappedRecognitions = LinkedList<Classifier.Recognition>()
+
+                        for (result in results ) {
+                            val location = result.location
+                            if (location != null && result.confidence >= MINIMUM_CONFIDENCE_OBJECT_DETECTION) {
+                                Log.i(MainActivity.TAG, "Found object: %s, confidence: %s".format(result.title, result.confidence))
+                                mappedRecognitions.add(result)
+                            }
+                        }
+
+                        computingDetection = false
+
+                        activity?.runOnUiThread {
+                            showLabels(mappedRecognitions)
+                        }
+                    })
+                }
+
+            // Select back camera as a default
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            converter = YuvToRgbConverter(requireContext())
+
+            try {
+                // Unbind use cases before rebinding
+                cameraProvider.unbindAll()
+
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(
+                    lifecycleOwner, cameraSelector, preview, imageAnalyzer)
+
+            } catch(exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
+        }
+
+        private fun showLabels(mappedRecognitions: LinkedList<Classifier.Recognition>) {
+            // recreate with new items
+            for (item in mappedRecognitions) {
+                if (preparationList.containsKey(item.title) && preparationList[item.title]!! > 800) {
+                    if (!labelList.containsKey(item.title)) {
+
+                        val button = Chip(requireActivity()).apply {
+                            textAlignment = View.TEXT_ALIGNMENT_CENTER
+                            text = item.title
+                            if (Build.VERSION.SDK_INT >= 23) {
+                                chipBackgroundColor = getColorStateList(
+                                    requireActivity(),
+                                    R.color.chip_states
+                                )
+                            } else {
+                                setChipBackgroundColorResource(R.color.quizBackground)
+                            }
+                            // TODO else?
+
+                            isCheckable = true
+
+                            if (firstObject?.name == item.title || secondObject?.name == item.title) {
+                                isChecked = true
+
+                                if (Build.VERSION.SDK_INT < 23) {
+                                    setChipBackgroundColorResource(R.color.backgroundSelected)
+                                }
+                            }
+                        }
+
+                        // map the object location from the cropped frame to the full camera preview
+                        val location = item.location
+
+                        // use inverse scaling for the portrait view (landscape camera)
+                        // adjust for center cropping
+                        if (previewWidth == 0 || previewHeight == 0) {
+                            previewWidth = binding.previewView.width
+                            previewHeight = binding.previewView.height
+                        }
+                        val minDimension = previewWidth.coerceAtMost(previewHeight)
+                        button.x =
+                            (minDimension - location.centerY() / cropSize * minDimension).coerceAtMost(
+                                (minDimension - button.width).toFloat()
+                            )
+                        button.y =
+                            (location.centerX() / cropSize * minDimension + (previewWidth.coerceAtLeast(previewHeight) - minDimension) / 2).coerceAtMost(
+                                (minDimension - button.height).toFloat()
+                            )
+                        // cropToFrameTransform.mapRect(location)
+
+                        binding.labelContainer.addView(button)
+                        labelList[item.title] = button
+                        button.setOnClickListener {
+                            if (Build.VERSION.SDK_INT < 23) {
+                                button.isChecked = !button.isChecked
+                                if (button.isChecked) {
+                                    button.setChipBackgroundColorResource(R.color.backgroundSelected)
+                                }
+                                else {
+                                    button.setChipBackgroundColorResource(R.color.quizBackground)
+                                    binding.firstSelectedLabel.visibility = View.GONE
+                                    preparationList.remove(firstObject?.name)
+                                    firstObject = null
+                                }
+
+                            }
+                            if (button.isChecked) {
+                                onLabelSelected(item.title, button.x, button.y)
+                            }
+                            else {
+                                binding.firstSelectedLabel.visibility = View.GONE
+                                preparationList.remove(firstObject?.name)
+                                firstObject = null
+                            }
+
+                        }
+                        button.postDelayed({
+                            // only show the label for SHOW_LABEL_DURATION milliseconds
+                            labelList.remove(item.title)
+                            (button.parent as ViewGroup).removeView(button)
+                            preparationList.remove(item.title)
+                        }, SHOW_LABEL_DURATION)
+                    }
+                } else {
+                    preparationList[item.title] = System.currentTimeMillis()
+                }
+            }
+        }
+
+    }
+
     private inner class ObjectAnalyzer(private val listener: ObjectListener): ImageAnalysis.Analyzer {
 
-        private fun ByteBuffer.toByteArray(): ByteArray {
-            rewind()    // Rewind the buffer to zero
-            val data = ByteArray(remaining())
-            get(data)   // Copy the buffer into a byte array
-            return data // Return the byte array
-        }
+//        private fun ByteBuffer.toByteArray(): ByteArray {
+//            rewind()    // Rewind the buffer to zero
+//            val data = ByteArray(remaining())
+//            get(data)   // Copy the buffer into a byte array
+//            return data // Return the byte array
+//        }
 
 
         @SuppressLint("UnsafeOptInUsageError")

@@ -42,4 +42,7 @@ interface SentenceDao {
     @Insert
     suspend fun insertSentence(sentence: Sentence)
 
+    @Delete
+    suspend fun deleteSentence(sentence: Sentence)
+
 }
