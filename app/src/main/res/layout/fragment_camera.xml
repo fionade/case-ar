@@ -17,91 +17,90 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/optionChipGroup"
+        android:layout_width="match_parent"
+        android:paddingLeft="@dimen/default_padding"
+        android:layout_gravity="bottom"
+        android:layout_height="wrap_content" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <LinearLayout
+            android:id="@+id/optionContainer"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:background="@color/quizBackground"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+            android:layout_height="wrap_content">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/quizContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/default_padding">
+
+                <TextView
+                    android:id="@+id/part1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    app:singleSelection="true"
+                    android:textSize="@dimen/medium_font_size"
+                    android:text="Der Hund steht neben" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/options"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/option1"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="das" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/option2"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="die" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/option3"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="dem" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <TextView
+                    android:id="@+id/part2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="@dimen/medium_font_size"
+                    android:text="Katze" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/labelContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/firstSelectedLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:background="@color/colorPrimary"
-            app:closeIconVisible="true"
-            android:textSize="@dimen/medium_font_size"
-            android:visibility="gone"/>
-
-        <LinearLayout
-            android:id="@+id/quizContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_margin="12dp"
-            android:background="@color/quizBackground"
-            android:padding="@dimen/default_padding"
-            android:visibility="gone" >
-
-            <TextView
-                android:id="@+id/part1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textSize="@dimen/medium_font_size"
-                android:text="Der Hund steht neben" />
-
-            <RadioGroup
-                android:id="@+id/options"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="@dimen/option_padding">
-
-                <RadioButton
-                    android:id="@+id/option1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="das"
-                    android:textColor="@color/colorText"
-                    android:textSize="@dimen/medium_font_size" />
-                <RadioButton
-                    android:id="@+id/option2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/colorText"
-                    android:text="der"
-                    android:textSize="@dimen/medium_font_size" />
-                <RadioButton
-                    android:id="@+id/option3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/colorText"
-                    android:text="dem"
-                    android:textSize="@dimen/medium_font_size" />
-            </RadioGroup>
-            <TextView
-                android:id="@+id/solution"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="die"
-                android:visibility="gone"
-                android:textColor="@color/colorPrimary"
-                android:textSize="@dimen/medium_font_size"
-                android:layout_margin="@dimen/option_padding"/>
-
-            <TextView
-                android:id="@+id/part2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textSize="@dimen/medium_font_size"
-                android:text="Katze" />
-        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

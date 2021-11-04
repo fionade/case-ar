@@ -9,4 +9,5 @@
 
     <color name="colorAnswerCorrect">#00612A</color>
     <color name="colorAnswerIncorrect">#D81B60</color>
+    <color name="colorOptionBackground">#333333</color>
 </resources>

@@ -27,7 +27,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.*
-import android.widget.RadioButton
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getColorStateList
 import androidx.camera.core.CameraSelector
@@ -36,9 +36,12 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
@@ -51,10 +54,10 @@ import de.lmu.arcasegrammar.sentencebuilder.SentenceManager
 import de.lmu.arcasegrammar.tensorflow.YuvToRgbConverter
 import de.lmu.arcasegrammar.tensorflow.tflite.Classifier
 import de.lmu.arcasegrammar.tensorflow.tflite.TFLiteObjectDetectionAPIModel
+import de.lmu.arcasegrammar.viewmodel.DetectionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -73,26 +76,22 @@ class CameraFragment: Fragment() {
 
         // Tensorflow minimum confidence for displaying label
         const val MINIMUM_CONFIDENCE_OBJECT_DETECTION = 0.55f
+        // view duration of object labels
         const val SHOW_LABEL_DURATION = 5000L
+        // image dimensions for Tensorflow input
+        const val CROP_SIZE = 300
     }
 
     // Quiz setup
-    private lateinit var sentenceManager: SentenceManager
-    private lateinit var sentence: Sentence
-    private var firstObject: DetectedObject? = null
-    private var secondObject: DetectedObject? = null
-    private var quizShown = false
-    private lateinit var optionList: Array<RadioButton>
+    private lateinit var optionList: Array<Chip>
+    private lateinit var bottomSheet: BottomSheetBehavior<LinearLayout>
 
     // Tensorflow setup
     private lateinit var detector: Classifier
     private var computingDetection = false
     private lateinit var croppedBitmap: Bitmap
-    // list to track times where objects first appeared
-    private val preparationList = HashMap<String, Long>()
     // list of currently displayed labels
-    private val labelList = HashMap<String, Chip>()
-    private val cropSize = 300
+    private var labelList = HashMap<String, Chip>()
 
     // Camera setup
     private var previewWidth = 0
@@ -104,14 +103,15 @@ class CameraFragment: Fragment() {
     private lateinit var bitmapBuffer: Bitmap
     private var imageRotationDegrees: Int = 0
 
+    // Logger
     private lateinit var firebaseLogger: FirebaseLogger
 
     // View binding
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
 
-    // History in Room database
-    private lateinit var sentenceDao: SentenceDao
+    // connect to ViewModel
+    private val viewModel: DetectionViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -135,45 +135,43 @@ class CameraFragment: Fragment() {
             activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
 
+        bottomSheet = BottomSheetBehavior.from(binding.optionContainer)
+        bottomSheet.isHideable = true
+        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        // View setup
-        binding.firstSelectedLabel.setOnCloseIconClickListener {
-            resetQuiz()
-        }
+        viewModel.sentence.observe(viewLifecycleOwner, {
+            // set the sentence and show the quiz
+            if (it != null) {
+                showQuiz(it)
+            }
 
-        // Quiz logic setup
-        sentenceManager = SentenceManager(requireContext())
+            // the sentence is null - hide the quiz
+            else {
+                resetQuiz()
+            }
+        })
+
 
         optionList = arrayOf(binding.option1, binding.option2, binding.option3)
-        optionList.forEach { it -> it.setOnClickListener {
-            onOptionSelected(it)
-        } }
+        optionList.forEach { it ->
+            it.setOnClickListener {onOptionSelected(it) }
+        }
 
         // check camera permission
         if (hasPermission()) {
             startCamera()
 
-            try {
-                detector = TFLiteObjectDetectionAPIModel.create(activity?.assets, "tensorflow/open_images_uint8.tflite", "tensorflow/open_images_labelmap_de.txt", cropSize, false)
-                croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Bitmap.Config.ARGB_8888)
-            }
-            catch (e: IOException) {
-                Log.e(TAG, "Exception initializing classifier", e)
-                Snackbar.make(binding.container, "Object Detection could not be initialized", Snackbar.LENGTH_SHORT).show()
-                activity?.finish()
-            }
         } else {
             requestPermission()
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        sentenceDao = HistoryDatabase.getDatabase(requireContext()).sentenceDao()
-
 
         super.onViewCreated(view, savedInstanceState)
     }
@@ -222,124 +220,90 @@ class CameraFragment: Fragment() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener(CameraRunnable(cameraProviderFuture, this), ContextCompat.getMainExecutor(requireContext()))
+
+        try {
+            detector = TFLiteObjectDetectionAPIModel.create(activity?.assets, "tensorflow/open_images_uint8.tflite", "tensorflow/open_images_labelmap_de.txt", CROP_SIZE, false)
+            croppedBitmap = Bitmap.createBitmap(CROP_SIZE, CROP_SIZE, Bitmap.Config.ARGB_8888)
+        }
+        catch (e: IOException) {
+            Log.e(TAG, "Exception initializing classifier", e)
+            Snackbar.make(binding.container, "Object Detection could not be initialized", Snackbar.LENGTH_SHORT).show()
+            activity?.finish()
+        }
     }
 
     private fun onLabelSelected(text: String, x: Float, y: Float) {
         val newObject = DetectedObject(text, PointF(x, y))
-        when {
-            firstObject == null -> {
-                firstObject = newObject
-                binding.firstSelectedLabel.text = text
-                binding.firstSelectedLabel.visibility = View.VISIBLE
-                quizShown = true
-                firebaseLogger.addLogMessage("label_tapped", "added first object $text")
-            }
-            secondObject == null -> {
-                secondObject = newObject
-                firebaseLogger.addLogMessage("label_tapped", "added second object $text")
-                showQuiz()
-            }
-            else -> {
-                resetQuiz()
-                firstObject = newObject
-                binding.firstSelectedLabel.text = firstObject?.name
-                binding.firstSelectedLabel.visibility = View.VISIBLE
-                quizShown = true
-                firebaseLogger.addLogMessage("label_tapped", "reset and added first object $text")
-            }
-        }
+
+        viewModel.addObject(newObject)
+
     }
 
 
-    private fun showQuiz() {
+    private fun showQuiz(sentence: Sentence) {
 
-        val constructedSentence = sentenceManager.constructSentence(firstObject!!, secondObject!!)
-        if (constructedSentence != null) {
+        binding.optionChipGroup.removeAllViews()
 
-            binding.firstSelectedLabel.visibility = View.GONE
-            binding.quizContainer.visibility = View.VISIBLE
+        // remove all checked labels from the label list
+        labelList = labelList.filter { !it.value.isChecked } as HashMap<String, Chip>
 
-            sentence = constructedSentence
+        binding.part1.text = sentence.firstPart
+        binding.part2.text = sentence.secondPart
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                sentenceDao.insertSentence(sentence)
-            }
+        binding.option1.text = sentence.distractors[0]
+        binding.option2.text = sentence.distractors[1]
+        binding.option3.text = sentence.distractors[2]
 
-            binding.part1.text = sentence.firstPart
-            binding.part2.text = sentence.secondPart
+        firebaseLogger.addLogMessage("show_quiz", sentence.stringify())
 
-            binding.option1.text = sentence.distractors[0]
-            binding.option2.text = sentence.distractors[1]
-            binding.option3.text = sentence.distractors[2]
-
-            binding.solution.text = sentence.wordToChoose
-            quizShown = true
-
-            firebaseLogger.addLogMessage("show_quiz", sentence.stringify())
-        }
-        else {
-            Snackbar.make(binding.root, getString(R.string.error_quiz_creation), Snackbar.LENGTH_SHORT).show()
-            firebaseLogger.addLogMessage("error_creating_quiz", "${firstObject!!.name} and ${secondObject!!.name}")
-        }
-
+        bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
 
     }
 
     private fun resetQuiz() {
-        if (quizShown) {
+        // reset the radio group so no item is preselected on subsequent quizzes
+        binding.options.clearCheck()
 
-            // reset the radio group so no item is preselected on subsequent quizzes
-            binding.options.clearCheck()
-
-            binding.solution.visibility = View.GONE
-            binding.options.visibility = View.VISIBLE
-            binding.quizContainer.visibility = View.GONE
-            binding.firstSelectedLabel.visibility = View.GONE
-
-            firstObject = null
-            secondObject = null
-
-            quizShown = false
-
-            optionList.forEach {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    it.setTextColor(resources.getColor(R.color.colorText, activity?.theme))
-                }
-                else {
-                    it.setTextColor(resources.getColor(R.color.colorText))
-                }
-            }
+        optionList.forEach {
+            it.setChipBackgroundColorResource(R.color.colorOptionBackground)
+            it.setTextColor(getColorStateList(requireActivity(), R.color.chip_states))
+            it.isCheckable = true
         }
+
+        // remove all checked labels from the label list
+        labelList = labelList.filter { !it.value.isChecked } as HashMap<String, Chip>
+        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun onOptionSelected(view: View) {
-        val checked = (view as RadioButton).isChecked
+        val chip = view as Chip
 
-        if (checked) {
-            if(view.text == sentence.wordToChoose) {
-                binding.options.visibility = View.GONE
-                binding.solution.visibility = View.VISIBLE
+        if(view.text == viewModel.sentence.value?.wordToChoose) {
+            // correct solution found
 
-                firebaseLogger.addLogMessage("answer_selected", "correct: ${sentence.wordToChoose}")
+            firebaseLogger.addLogMessage("answer_selected", "correct: ${view.text}")
 
-                binding.quizContainer.postDelayed({
-                    if (_binding?.solution?.visibility == View.VISIBLE) {
-                        resetQuiz()
-                    }
-                }, 3000) // hide quiz 3 seconds after a correct answer
+            chip.setChipBackgroundColorResource(R.color.colorAnswerCorrect)
+
+            optionList.forEach {
+                it.isCheckable = false
             }
-            else {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    view.setTextColor(resources.getColor(R.color.colorAccent, activity?.theme))
-                }
-                else {
-                    view.setTextColor(resources.getColor(R.color.colorAccent))
-                }
 
-                firebaseLogger.addLogMessage("answer_selected", "wrong: ${view.text}")
-            }
+            binding.quizContainer.postDelayed({
+                if (_binding != null) {
+                    resetQuiz()
+                }
+            }, 3000) // hide quiz 3 seconds after a correct answer
         }
+        else {
 
+            chip.setChipBackgroundColorResource(R.color.colorAnswerIncorrect)
+
+            // cannot be selected twice
+            chip.isCheckable = false
+
+            firebaseLogger.addLogMessage("answer_selected", "wrong: ${view.text}")
+        }
     }
 
 
@@ -366,7 +330,7 @@ class CameraFragment: Fragment() {
                 }
 
             val imageAnalyzer = ImageAnalysis.Builder()
-                .setTargetResolution(Size(cropSize, cropSize))
+                .setTargetResolution(Size(CROP_SIZE, CROP_SIZE))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
@@ -410,88 +374,84 @@ class CameraFragment: Fragment() {
         private fun showLabels(mappedRecognitions: LinkedList<Classifier.Recognition>) {
             // recreate with new items
             for (item in mappedRecognitions) {
-                if (preparationList.containsKey(item.title) && preparationList[item.title]!! > 800) {
-                    if (!labelList.containsKey(item.title)) {
+                if (!labelList.containsKey(item.title)) {
 
-                        val button = Chip(requireActivity()).apply {
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            text = item.title
-                            if (Build.VERSION.SDK_INT >= 23) {
-                                chipBackgroundColor = getColorStateList(
-                                    requireActivity(),
-                                    R.color.chip_states
-                                )
-                            } else {
-                                setChipBackgroundColorResource(R.color.quizBackground)
-                            }
-                            // TODO else?
-
-                            isCheckable = true
-
-                            if (firstObject?.name == item.title || secondObject?.name == item.title) {
-                                isChecked = true
-
-                                if (Build.VERSION.SDK_INT < 23) {
-                                    setChipBackgroundColorResource(R.color.backgroundSelected)
-                                }
-                            }
+                    val button = Chip(requireActivity()).apply {
+                        textAlignment = View.TEXT_ALIGNMENT_CENTER
+                        text = item.title
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            chipBackgroundColor = getColorStateList(requireActivity(), R.color.chip_states)
+                        } else {
+                            setChipBackgroundColorResource(R.color.quizBackground)
                         }
 
-                        // map the object location from the cropped frame to the full camera preview
-                        val location = item.location
-
-                        // use inverse scaling for the portrait view (landscape camera)
-                        // adjust for center cropping
-                        if (previewWidth == 0 || previewHeight == 0) {
-                            previewWidth = binding.previewView.width
-                            previewHeight = binding.previewView.height
-                        }
-                        val minDimension = previewWidth.coerceAtMost(previewHeight)
-                        button.x =
-                            (minDimension - location.centerY() / cropSize * minDimension).coerceAtMost(
-                                (minDimension - button.width).toFloat()
-                            )
-                        button.y =
-                            (location.centerX() / cropSize * minDimension + (previewWidth.coerceAtLeast(previewHeight) - minDimension) / 2).coerceAtMost(
-                                (minDimension - button.height).toFloat()
-                            )
-                        // cropToFrameTransform.mapRect(location)
-
-                        binding.labelContainer.addView(button)
-                        labelList[item.title] = button
-                        button.setOnClickListener {
-                            if (Build.VERSION.SDK_INT < 23) {
-                                button.isChecked = !button.isChecked
-                                if (button.isChecked) {
-                                    button.setChipBackgroundColorResource(R.color.backgroundSelected)
-                                }
-                                else {
-                                    button.setChipBackgroundColorResource(R.color.quizBackground)
-                                    binding.firstSelectedLabel.visibility = View.GONE
-                                    preparationList.remove(firstObject?.name)
-                                    firstObject = null
-                                }
-
-                            }
-                            if (button.isChecked) {
-                                onLabelSelected(item.title, button.x, button.y)
-                            }
-                            else {
-                                binding.firstSelectedLabel.visibility = View.GONE
-                                preparationList.remove(firstObject?.name)
-                                firstObject = null
-                            }
-
-                        }
-                        button.postDelayed({
-                            // only show the label for SHOW_LABEL_DURATION milliseconds
-                            labelList.remove(item.title)
-                            (button.parent as ViewGroup).removeView(button)
-                            preparationList.remove(item.title)
-                        }, SHOW_LABEL_DURATION)
+                        isCheckable = true
                     }
-                } else {
-                    preparationList[item.title] = System.currentTimeMillis()
+
+                    // map the object location from the cropped frame to the full camera preview
+                    val location = item.location
+
+                    // use inverse scaling for the portrait view (landscape camera)
+                    // adjust for center cropping
+                    if (previewWidth == 0 || previewHeight == 0) {
+                        previewWidth = binding.previewView.width
+                        previewHeight = binding.previewView.height
+                    }
+
+                    val minDimension = previewWidth.coerceAtMost(previewHeight)
+                    button.x =
+                        (minDimension - location.centerY() / CROP_SIZE * minDimension).coerceAtMost(
+                            (minDimension - button.width).toFloat()
+                        )
+                    button.y =
+                        (location.centerX() / CROP_SIZE * minDimension + (previewWidth.coerceAtLeast(previewHeight) - minDimension) / 2).coerceAtMost(
+                            (minDimension - button.height).toFloat()
+                        )
+
+                    button.postDelayed({
+                        // only show the label for SHOW_LABEL_DURATION milliseconds
+                        if (!button.isChecked) {
+                            labelList.remove(item.title)
+                            if (button.parent != null) {
+                                (button.parent as ViewGroup).removeView(button)
+                            }
+                        }
+                    }, SHOW_LABEL_DURATION)
+
+
+                    // cropToFrameTransform.mapRect(location)
+
+                    binding.labelContainer.addView(button)
+                    labelList[item.title] = button
+
+                    button.setOnClickListener {
+                        if (button.isChecked) {
+                            // add to constraint layout
+                            binding.labelContainer.removeView(button)
+
+                            // TODO performance: only add if there is no object in the group yet
+                            button.x = 0F
+                            button.y = 0F
+                            binding.optionChipGroup.addView(button)
+
+                            if (Build.VERSION.SDK_INT < 23) {
+                                button.setChipBackgroundColorResource(R.color.backgroundSelected)
+                            }
+                            onLabelSelected(item.title, button.x, button.y)
+                        }
+                        else {
+
+                            viewModel.deleteObject(item.title)
+                            labelList.remove(item.title)
+                            binding.optionChipGroup.removeView(button)
+
+                            if (Build.VERSION.SDK_INT < 23) {
+                                button.setChipBackgroundColorResource(R.color.quizBackground)
+                            }
+
+                        }
+
+                    }
                 }
             }
         }
@@ -520,7 +480,7 @@ class CameraFragment: Fragment() {
 
             image.use { converter.yuvToRgb(image.image!!, bitmapBuffer) }
 
-            croppedBitmap = ThumbnailUtils.extractThumbnail(bitmapBuffer, cropSize, cropSize)
+            croppedBitmap = ThumbnailUtils.extractThumbnail(bitmapBuffer, CROP_SIZE, CROP_SIZE)
 
             // to cropped bitmap
             val detected = detector.recognizeImage(croppedBitmap)

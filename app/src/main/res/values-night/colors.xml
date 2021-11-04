@@ -6,4 +6,6 @@
     <color name="backgroundSelected">#e8d044</color>
     <color name="quizBackground">#333333</color>
     <color name="colorText">#888888</color>
+
+    <color name="colorOptionBackground">#666666</color>
 </resources>
