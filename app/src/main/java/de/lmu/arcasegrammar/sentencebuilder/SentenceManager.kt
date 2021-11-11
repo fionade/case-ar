@@ -25,9 +25,7 @@ import java.io.IOException
 import kotlin.math.abs
 import kotlin.random.Random
 
-class SentenceManager// loading data from assets
-// only do this once to avoid file system access
-    (context: Context) {
+class SentenceManager(context: Context) {
 
     companion object {
         const val NUMBER_OF_DISTRACTORS = 2
@@ -40,6 +38,8 @@ class SentenceManager// loading data from assets
     init {
         val objectString: String
         try {
+            // loading data from assets
+            // only do this once to avoid file system access
             objectString = context.assets.open("data/open_images_objects.json").bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(objectString)
             val sentenceObject = jsonObject.getJSONArray("objects")
@@ -84,7 +84,7 @@ class SentenceManager// loading data from assets
     }
 
 
-    fun createAccusativeSentence(firstWord: Word, secondWord: Word, position: String) : Sentence {
+    private fun createAccusativeSentence(firstWord: Word, secondWord: Word, position: String) : Sentence {
 
         // Accusative sentence:
         // Personal pronoun or name + verb + accusative object 1 + preposition + accusative object 2
@@ -95,10 +95,10 @@ class SentenceManager// loading data from assets
         val wordToChoose = secondWord.accusative.article
         val secondPart = secondWord.accusative.noun
 
-        return Sentence(firstPart, wordToChoose, secondPart, generateDistractors(wordToChoose, false))
+        return Sentence(firstPart, wordToChoose, secondPart, generateDistractors(wordToChoose))
     }
 
-    fun createDativeSentence(firstWord: Word, secondWord: Word, position: String) : Sentence {
+    private fun createDativeSentence(firstWord: Word, secondWord: Word, position: String) : Sentence {
 
         // Dative sentence:
         // Nominative object 1 + verb + preposition + dative object 2
@@ -108,21 +108,27 @@ class SentenceManager// loading data from assets
         val wordToChoose = secondWord.dative.article
         val secondPart = secondWord.dative.noun
 
+        var distractors = generateDistractors(wordToChoose)
         return if (firstPart.endsWith("von") && wordToChoose == "dem") {
-            Sentence(firstPart.replace("von", ""), "vom", secondPart, generateDistractors("vom", true))
+            distractors = distractors.map {
+                // add "von" to all distractor options
+                if (it == "dem") "vom" else "von $it"
+            } as ArrayList<String>
+            // then remove "von" from the first part of the sentence
+            Sentence(firstPart.replace("von", ""), "vom", secondPart, distractors)
         } else {
-            Sentence(firstPart, wordToChoose, secondPart, generateDistractors(wordToChoose, false))
+            Sentence(firstPart, wordToChoose, secondPart, distractors)
         }
     }
 
-    private fun generateDistractors(wordToChoose: String, contraction: Boolean) : ArrayList<String> {
+    private fun generateDistractors(wordToChoose: String) : ArrayList<String> {
 
         val distractors = ArrayList<String>(NUMBER_OF_DISTRACTORS + 1)
         distractors.add(wordToChoose)
 
         while (distractors.size < NUMBER_OF_DISTRACTORS + 1) {
             val index = Random.nextInt(SOLUTION_OPTIONS.size)
-            val nextWord = if (!contraction) SOLUTION_OPTIONS[index] else "von ${SOLUTION_OPTIONS[index]}"
+            val nextWord = SOLUTION_OPTIONS[index]
             if (!distractors.contains(nextWord)) {
                 distractors.add(nextWord)
             }
