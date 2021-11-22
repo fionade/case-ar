@@ -10,4 +10,6 @@
     <string name="camera">Camera</string>
     <string name="history_title">History</string>
     <string name="error_quiz_creation">Error while creating quiz</string>
+    <string name="history_detail_title">Sentence Details</string>
+    <string name="empty_history_explanation">No sentences found. Tap on object labels in the Camera view to get started.</string>
 </resources>

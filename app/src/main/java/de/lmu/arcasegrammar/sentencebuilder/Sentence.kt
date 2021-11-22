@@ -45,4 +45,7 @@ interface SentenceDao {
     @Delete
     suspend fun deleteSentence(sentence: Sentence)
 
+    @Query("SELECT * FROM sentence WHERE id = (:id) LIMIT 1")
+    suspend fun getSentence(id: Long): Sentence
+
 }

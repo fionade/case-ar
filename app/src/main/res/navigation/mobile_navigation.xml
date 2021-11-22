@@ -18,6 +18,12 @@
         tools:layout="@layout/fragment_history" />
 
     <fragment
+        android:id="@+id/navigation_history_to_detail"
+        android:name="de.lmu.arcasegrammar.HistoryDetailFragment"
+        android:label="@string/history_detail_title"
+        tools:layout="@layout/fragment_history_detail" />
+
+    <fragment
         android:id="@+id/navigation_info"
         android:name="de.lmu.arcasegrammar.InfoFragment"
         android:label="@string/info_title"

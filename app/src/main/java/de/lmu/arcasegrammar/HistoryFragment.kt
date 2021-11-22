@@ -8,8 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +25,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 
-class HistoryFragment : Fragment() {
+class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
 
     // View binding
     private var _binding: FragmentHistoryBinding? = null
@@ -43,7 +45,7 @@ class HistoryFragment : Fragment() {
         var sentenceList: MutableList<Sentence> = mutableListOf()
 
 
-        val historyAdapter = HistoryAdapter(sentenceList)
+        val historyAdapter = HistoryAdapter(sentenceList, this)
         binding.historyList.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = historyAdapter
@@ -57,6 +59,13 @@ class HistoryFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 historyAdapter.setData(sentenceList)
                 historyAdapter.notifyDataSetChanged()
+
+                if (sentenceList.size == 0) {
+                    binding.emptyListWarning.visibility = View.VISIBLE
+                }
+                else {
+                    binding.emptyListWarning.visibility = View.GONE
+                }
             }
         }
 
@@ -126,6 +135,11 @@ class HistoryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onItemTouched(id: Long) {
+        val bundle = bundleOf("showSentence" to id)
+        findNavController().navigate(R.id.navigation_history_to_detail, bundle)
     }
 
 }
