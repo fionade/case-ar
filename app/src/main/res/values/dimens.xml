@@ -5,4 +5,5 @@
     <dimen name="medium_font_size">24sp</dimen>
     <dimen name="horizontal_list_padding">16dp</dimen>
     <dimen name="vertical_list_padding">12dp</dimen>
+    <dimen name="fab_layout_margin">24dp</dimen>
 </resources>

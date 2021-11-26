@@ -36,27 +36,20 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
 import de.lmu.arcasegrammar.databinding.FragmentCameraBinding
 import de.lmu.arcasegrammar.model.DetectedObject
-import de.lmu.arcasegrammar.model.HistoryDatabase
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
-import de.lmu.arcasegrammar.sentencebuilder.SentenceDao
-import de.lmu.arcasegrammar.sentencebuilder.SentenceManager
 import de.lmu.arcasegrammar.tensorflow.YuvToRgbConverter
 import de.lmu.arcasegrammar.tensorflow.tflite.Classifier
 import de.lmu.arcasegrammar.tensorflow.tflite.TFLiteObjectDetectionAPIModel
 import de.lmu.arcasegrammar.viewmodel.DetectionViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -138,6 +131,7 @@ class CameraFragment: Fragment() {
         bottomSheet = BottomSheetBehavior.from(binding.optionContainer)
         bottomSheet.isHideable = true
         bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+//        bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
 
 
         return view
@@ -145,10 +139,28 @@ class CameraFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        // users can trigger a new quiz being created by tapping the start button
+        binding.startQuiz.setOnClickListener {
+            viewModel.startQuiz()
+        }
+
+        // The start button is only visible if at least one label has been selected
+        viewModel.preparationList.observe(viewLifecycleOwner, {
+            if (it != null && it.size > 0 && viewModel.sentence.value == null) {
+                binding.startQuiz.visibility = View.VISIBLE
+                binding.startQuiz.show()
+            }
+            else {
+                binding.startQuiz.visibility = View.GONE
+            }
+        })
+
+        // Show a quiz once it's available
         viewModel.sentence.observe(viewLifecycleOwner, {
             // set the sentence and show the quiz
             if (it != null) {
                 showQuiz(it)
+                binding.startQuiz.visibility = View.GONE
             }
 
             // the sentence is null - hide the quiz
@@ -156,7 +168,6 @@ class CameraFragment: Fragment() {
                 resetQuiz()
             }
         })
-
 
         optionList = arrayOf(binding.option1, binding.option2, binding.option3)
         optionList.forEach { it ->
@@ -211,7 +222,7 @@ class CameraFragment: Fragment() {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startCamera()
             } else {
-                requestPermission();
+                requestPermission()
             }
         }
     }
@@ -236,6 +247,7 @@ class CameraFragment: Fragment() {
         val newObject = DetectedObject(text, PointF(x, y))
 
         viewModel.addObject(newObject)
+        bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
 
     }
 
@@ -256,7 +268,7 @@ class CameraFragment: Fragment() {
 
         firebaseLogger.addLogMessage("show_quiz", sentence.stringify())
 
-        bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.quizContainer.visibility = View.VISIBLE
 
     }
 
@@ -272,7 +284,9 @@ class CameraFragment: Fragment() {
 
         // remove all checked labels from the label list
         labelList = labelList.filter { !it.value.isChecked } as HashMap<String, Chip>
-        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+
+        binding.quizContainer.visibility = View.GONE
+//        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun onOptionSelected(view: View) {
@@ -291,7 +305,7 @@ class CameraFragment: Fragment() {
 
             binding.quizContainer.postDelayed({
                 if (_binding != null) {
-                    resetQuiz()
+                    viewModel.reset()
                 }
             }, 3000) // hide quiz 3 seconds after a correct answer
         }

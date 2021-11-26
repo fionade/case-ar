@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,28 +8,15 @@
     android:background="@android:color/black"
     tools:context=".CameraFragment" >
 
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <androidx.camera.view.PreviewView
-            android:id="@+id/previewView"
+        <FrameLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
-
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/optionChipGroup"
-        android:layout_width="match_parent"
-        android:paddingLeft="@dimen/default_padding"
-        android:layout_gravity="bottom"
-        android:layout_height="wrap_content" />
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+            android:layout_height="match_parent">
+            <androidx.camera.view.PreviewView
+                android:id="@+id/previewView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/optionContainer"
@@ -38,7 +26,16 @@
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
             android:layout_height="wrap_content">
 
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/optionChipGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/default_padding"
+                android:paddingEnd="@dimen/default_padding"
+                android:layout_marginEnd="@dimen/fab_layout_margin"
+                android:layout_gravity="bottom" />
+
+            <LinearLayout
                 android:id="@+id/quizContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,7 +92,16 @@
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/startQuiz"
+            app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+            app:layout_anchor="@id/optionContainer"
+            app:layout_anchorGravity="top|end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_padding"
+            android:contentDescription="@string/start" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/labelContainer"
@@ -104,4 +110,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

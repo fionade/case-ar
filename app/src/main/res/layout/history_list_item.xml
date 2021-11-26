@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/history_quiz_title"
-        android:textSize="@dimen/medium_font_size"
         android:paddingHorizontal="@dimen/horizontal_list_padding"
         android:paddingVertical="@dimen/vertical_list_padding"/>
 

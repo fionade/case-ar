@@ -35,6 +35,8 @@ class SentenceManager(context: Context) {
     private val objects = mutableMapOf<String, Word>()
     // test: objects.isInitalized
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     init {
         val objectString: String
         try {
@@ -44,7 +46,7 @@ class SentenceManager(context: Context) {
             val jsonObject = JSONObject(objectString)
             val sentenceObject = jsonObject.getJSONArray("objects")
             for (i in 0 until sentenceObject.length()) {
-                val word = Json.decodeFromString<Word>(sentenceObject[i].toString())
+                val word = json.decodeFromString<Word>(sentenceObject[i].toString())
                 this.objects[word.nominative.noun] = word
             }
         }
@@ -54,6 +56,17 @@ class SentenceManager(context: Context) {
         catch (jsonException: JSONException) {
             jsonException.printStackTrace()
         }
+    }
+
+    fun constructSingleSentence(item: DetectedObject): Sentence? {
+
+        if(objects.containsKey(item.name) && objects.containsKey(item.name)) {
+            val word = objects.getValue(item.name)
+            val distractors = generateDistractors(word.accusative.article)
+            return Sentence("Das ist", word.accusative.article, word.accusative.noun, distractors)
+        }
+
+        return null
     }
 
     fun constructSentence(firstItem: DetectedObject, secondItem: DetectedObject) : Sentence? {

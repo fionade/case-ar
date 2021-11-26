@@ -20,4 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--dontobfuscate
+#-dontobfuscate
+
+-keepclassmembers,allowoptimization class de.lmu.arcasegrammar.** {
+    *** Companion;
+}
+-keepclassmembers,allowoptimization class de.lmu.arcasegrammar.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

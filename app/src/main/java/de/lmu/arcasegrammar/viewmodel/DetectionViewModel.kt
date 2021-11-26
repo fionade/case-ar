@@ -3,7 +3,6 @@ package de.lmu.arcasegrammar.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.lmu.arcasegrammar.FirebaseLogger
 import de.lmu.arcasegrammar.model.DetectedObject
@@ -18,7 +17,7 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
     private var sentenceManager: SentenceManager = SentenceManager(application)
     var sentence: MutableLiveData<Sentence?> = MutableLiveData(null)
 
-    private val preparationList: MutableLiveData<ArrayList<DetectedObject>> = MutableLiveData(ArrayList())
+    val preparationList: MutableLiveData<ArrayList<DetectedObject>> = MutableLiveData(ArrayList())
 
     // history
     private val sentenceDao = HistoryDatabase.getDatabase(application).sentenceDao()
@@ -28,30 +27,10 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun addObject(detectedObject: DetectedObject) {
         preparationList.value?.add(detectedObject)
+        // set the list as value so observers are notified
+        preparationList.value = preparationList.value
 
-        if (preparationList.value != null) {
-            when(preparationList.value!!.size) {
-                1 -> {
-                    firebaseLogger.addLogMessage("label_tapped", "added first object ${detectedObject.name}")
-                }
-                2 -> {
-                    firebaseLogger.addLogMessage("label_tapped", "added second object ${detectedObject.name}")
-                    // construct sentence
-                    sentence.value = sentenceManager.constructSentence(
-                        preparationList.value!![0],
-                        preparationList.value!![1]
-                    )
-
-                    addToHistory()
-                }
-                3 -> {
-                    firebaseLogger.addLogMessage("label_tapped", "reset and selected first ${detectedObject.name}")
-                    sentence.value = null
-                    preparationList.value!!.removeAt(1)
-                    preparationList.value!!.removeAt(0)
-                }
-            }
-        }
+        firebaseLogger.addLogMessage("label_tapped", "added object ${preparationList.value!!.size}: ${detectedObject.name}")
     }
 
     fun deleteObject(title: String) {
@@ -59,9 +38,40 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
             it.name != title
         } as ArrayList
 
-        if (preparationList.value == null || (preparationList.value != null && preparationList.value!!.size < 2)) {
-            sentence.value = null
+    }
+
+    fun startQuiz() {
+
+        if (preparationList.value != null) {
+            when {
+                preparationList.value!!.size == 1 -> {
+                    sentence.value = sentenceManager.constructSingleSentence(preparationList.value!![0])
+
+                }
+                preparationList.value!!.size == 2 -> {
+                    // construct sentence
+                    sentence.value = sentenceManager.constructSentence(
+                        preparationList.value!![0],
+                        preparationList.value!![1]
+                    )
+                }
+                preparationList.value!!.size > 2 -> {
+
+                    preparationList.value?.shuffle()
+                    sentence.value = sentenceManager.constructSentence(
+                        preparationList.value!![0],
+                        preparationList.value!![1]
+                    )
+                }
+            }
+
+            addToHistory()
         }
+    }
+
+    fun reset() {
+        sentence.value = null
+        preparationList.value = ArrayList()
     }
 
     private fun addToHistory() {

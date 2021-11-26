@@ -32,8 +32,18 @@ class HistoryDetailFragment : Fragment() {
                 binding.detailFirstPart.text = it.firstPart
                 binding.detailSolution.text = it.wordToChoose
                 binding.detailSecondPart.text = it.secondPart
+
+                binding.detailSolution.visibility = View.INVISIBLE
+                binding.showAnswerButton.visibility = View.VISIBLE
             }
         })
+
+        binding.showAnswerButton.setOnClickListener {
+            if (binding.detailSolution.visibility == View.INVISIBLE) {
+                binding.detailSolution.visibility = View.VISIBLE
+                binding.showAnswerButton.visibility = View.INVISIBLE
+            }
+        }
 
         arguments?.getLong("showSentence")?.let { it ->
             sentenceId = it
