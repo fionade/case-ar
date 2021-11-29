@@ -20,6 +20,7 @@ import de.lmu.arcasegrammar.databinding.FragmentHistoryBinding
 import de.lmu.arcasegrammar.model.HistoryDatabase
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 import de.lmu.arcasegrammar.sentencebuilder.SentenceDao
+import de.lmu.arcasegrammar.viewhelpers.HistoryAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.abs

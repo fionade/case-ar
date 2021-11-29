@@ -44,6 +44,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
 import de.lmu.arcasegrammar.databinding.FragmentCameraBinding
+import de.lmu.arcasegrammar.logging.FirebaseLogger
 import de.lmu.arcasegrammar.model.DetectedObject
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 import de.lmu.arcasegrammar.tensorflow.YuvToRgbConverter
@@ -83,7 +84,7 @@ class CameraFragment: Fragment() {
     private lateinit var detector: Classifier
     private var computingDetection = false
     private lateinit var croppedBitmap: Bitmap
-    // list of currently displayed labels
+    // list of currently displayed label views
     private var labelList = HashMap<String, Chip>()
 
     // Camera setup

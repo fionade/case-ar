@@ -25,7 +25,7 @@ import java.io.IOException
 import kotlin.math.abs
 import kotlin.random.Random
 
-class SentenceManager(context: Context) {
+class SentenceManager(private val context: Context) {
 
     companion object {
         const val NUMBER_OF_DISTRACTORS = 2
@@ -60,6 +60,33 @@ class SentenceManager(context: Context) {
 
     fun constructSingleSentence(item: DetectedObject): Sentence? {
 
+        try {
+            // loading data from assets
+            val title = item.name
+                .lowercase()
+                .replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace("ß", "ss")
+            val objectString = context.assets.open("data/literature/$title.txt").bufferedReader().use { it.readText() }
+            val lines = objectString.split("\n")
+
+            // choose random line
+            val sentence = lines[Random.nextInt(lines.size)]
+
+            for (article in SOLUTION_OPTIONS) {
+                if (sentence.contains(article)) {
+                    val index = sentence.indexOf(article)
+                    val distractors = generateDistractors(article)
+                    return Sentence(sentence.substring(0, index), article, sentence.substring(index + article.length), distractors)
+                }
+            }
+        }
+        catch (ioException: IOException) {
+            ioException.printStackTrace()
+        }
+
+        // fallback for objects without text resources
         if(objects.containsKey(item.name) && objects.containsKey(item.name)) {
             val word = objects.getValue(item.name)
             val distractors = generateDistractors(word.accusative.article)

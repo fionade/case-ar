@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import de.lmu.arcasegrammar.FirebaseLogger
+import de.lmu.arcasegrammar.logging.FirebaseLogger
 import de.lmu.arcasegrammar.model.DetectedObject
 import de.lmu.arcasegrammar.model.HistoryDatabase
 import de.lmu.arcasegrammar.sentencebuilder.Sentence

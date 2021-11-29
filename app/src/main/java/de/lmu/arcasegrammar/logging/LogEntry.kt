@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.lmu.arcasegrammar.model
+package de.lmu.arcasegrammar.logging
 
 import kotlinx.serialization.Serializable
 

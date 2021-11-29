@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.lmu.arcasegrammar
+package de.lmu.arcasegrammar.logging
 
 class FirebaseLogger {
 
@@ -21,8 +21,8 @@ class FirebaseLogger {
         private var myInstance: FirebaseLogger? = null
 
         fun getInstance() =
-            myInstance?: synchronized(this) {
-                myInstance?: FirebaseLogger().also {
+            myInstance ?: synchronized(this) {
+                myInstance ?: FirebaseLogger().also {
                     myInstance = it
                 }
             }

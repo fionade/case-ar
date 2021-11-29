@@ -1,9 +1,10 @@
-package de.lmu.arcasegrammar
+package de.lmu.arcasegrammar.viewhelpers
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import de.lmu.arcasegrammar.R
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 
 class HistoryAdapter(private var sentenceList: List<Sentence>, private val listener: SentenceTouchListener) : RecyclerView.Adapter<HistoryAdapter.MyViewHolder>() {
