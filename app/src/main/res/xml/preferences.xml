@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Example Sources">
+
+        <SwitchPreferenceCompat
+            app:key="novels"
+            app:defaultValue="true"
+            app:title="Use examples from literary work"/>
+
+        <SwitchPreferenceCompat
+            app:key="quotes"
+            app:defaultValue="true"
+            app:title="Use famous quotes"/>
+
+        <!--<SwitchPreferenceCompat
+            app:key="wikipedia"
+            app:defaultValue="true"
+            app:title="Use Wikipedia entries"/>-->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Language Exercises">
+
+        <SwitchPreferenceCompat
+            app:key="determiners"
+            app:defaultValue="true"
+            app:title="Articles and grammatical gender"
+            app:summary="Practice articles, cases, grammatical gender"/>
+
+        <SwitchPreferenceCompat
+            app:key="vocabulary"
+            app:defaultValue="true"
+            app:title="Vocabulary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="About">
+
+        <Preference
+            app:key="info"
+            app:title="Show privacy information">
+        </Preference>
+
+        <!-- <Preference></Preference> show user ID -->
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

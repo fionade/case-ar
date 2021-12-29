@@ -14,4 +14,5 @@
     <string name="empty_history_explanation">No sentences found. Tap on object labels in the Camera view to get started.</string>
     <string name="show_answer">Show answer</string>
     <string name="start">Start</string>
+    <string name="preferences_title">Settings</string>
 </resources>

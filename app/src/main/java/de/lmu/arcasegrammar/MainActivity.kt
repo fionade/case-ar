@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.lmu.arcasegrammar.logging.FirebaseLogger
 import java.util.*
@@ -55,6 +56,9 @@ class MainActivity : AppCompatActivity() {
                 firebaseLogger.setUserId(userID!!)
             }
         }
+
+        // set default values for preferences when the app is started for the first time
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
         firebaseLogger.addLogMessage("app_started")
 

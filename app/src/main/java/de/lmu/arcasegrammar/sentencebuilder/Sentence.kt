@@ -22,6 +22,7 @@ data class Sentence(val firstPart: String,
                     val wordToChoose: String,
                     val secondPart: String,
                     val distractors: ArrayList<String>,
+                    val attribution: String?,
                     @PrimaryKey(autoGenerate = true) var id: Long = 0) {
 
     fun stringify(): String {

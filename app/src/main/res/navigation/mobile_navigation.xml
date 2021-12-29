@@ -25,6 +25,11 @@
 
     <fragment
         android:id="@+id/navigation_info"
+        android:name="de.lmu.arcasegrammar.PreferenceFragment"
+        android:label="@string/preferences_title" />
+
+    <fragment
+        android:id="@+id/navigation_prefs_info"
         android:name="de.lmu.arcasegrammar.InfoFragment"
         android:label="@string/info_title"
         tools:layout="@layout/fragment_info" />

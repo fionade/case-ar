@@ -262,6 +262,7 @@ class CameraFragment: Fragment() {
 
         binding.part1.text = sentence.firstPart
         binding.part2.text = sentence.secondPart
+        binding.attribution.text = sentence.attribution ?: ""
 
         binding.option1.text = sentence.distractors[0]
         binding.option2.text = sentence.distractors[1]
@@ -363,7 +364,9 @@ class CameraFragment: Fragment() {
                         computingDetection = false
 
                         activity?.runOnUiThread {
-                            showLabels(mappedRecognitions)
+                            if (_binding != null) {
+                                showLabels(mappedRecognitions)
+                            }
                         }
                     })
                 }

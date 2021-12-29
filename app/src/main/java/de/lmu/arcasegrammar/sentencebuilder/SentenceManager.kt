@@ -16,6 +16,8 @@
 package de.lmu.arcasegrammar.sentencebuilder
 
 import android.content.Context
+import androidx.preference.PreferenceManager
+import com.opencsv.CSVReader
 import de.lmu.arcasegrammar.model.DetectedObject
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -60,37 +62,79 @@ class SentenceManager(private val context: Context) {
 
     fun constructSingleSentence(item: DetectedObject): Sentence? {
 
-        try {
-            // loading data from assets
-            val title = item.name
-                .lowercase()
-                .replace("ä", "ae")
-                .replace("ö", "oe")
-                .replace("ü", "ue")
-                .replace("ß", "ss")
-            val objectString = context.assets.open("data/literature/$title.txt").bufferedReader().use { it.readText() }
-            val lines = objectString.split("\n")
+        val priority = arrayListOf(UseOptions.USE_POSITION)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-            // choose random line
-            val sentence = lines[Random.nextInt(lines.size)]
+        val useNovels = sharedPreferences.getBoolean("novels", true)
+        if (useNovels) {
+            priority.add(UseOptions.USE_NOVELS)
+        }
+        val useQuotes = sharedPreferences.getBoolean("quotes", true)
+        if (useQuotes) {
+            priority.add(UseOptions.USE_QUOTES)
+        }
 
-            for (article in SOLUTION_OPTIONS) {
-                if (sentence.contains(article)) {
-                    val index = sentence.indexOf(article)
-                    val distractors = generateDistractors(article)
-                    return Sentence(sentence.substring(0, index), article, sentence.substring(index + article.length), distractors)
+        priority.shuffle()
+
+        for(option in priority) {
+            when(option) {
+                UseOptions.USE_NOVELS -> {
+                    try {
+                        // loading data from assets
+                        val title = getAssetFileName(item.name)
+                        val objectString = context.assets.open("data/literature/$title.txt").bufferedReader().use { it.readText() }
+                        val lines = objectString.split("\n")
+
+                        // choose random line
+                        val sentence = lines[Random.nextInt(lines.size)]
+
+                        for (article in SOLUTION_OPTIONS) {
+                            if (sentence.contains(" $article ") || sentence.contains("${article.capitalize()} ")) { // articles within a word are not accepted.
+                                val index = sentence.indexOf(article)
+                                val distractors = generateDistractors(article)
+                                return Sentence(sentence.substring(0, index), article, sentence.substring(index + article.length), distractors, null)
+                            }
+                        }
+                    }
+                    catch (ioException: IOException) {
+                        ioException.printStackTrace()
+                        continue
+                    }
+                }
+                UseOptions.USE_QUOTES -> {
+                    try {
+                        // loading data from assets
+                        val title = getAssetFileName(item.name)
+                        val objectReader = context.assets.open("data/quotes/$title.csv").bufferedReader()
+
+                        val reader = CSVReader(objectReader)
+                        val entries = reader.readAll()
+
+                        // choose random line
+                        val quote = entries[Random.nextInt(entries.size)]
+
+                        for (article in SOLUTION_OPTIONS) {
+                            if (quote.size == 2 && (quote[0].contains("$article ") || quote[0].contains("${article.capitalize()} "))) { // articles within a word are not accepted.
+                                val index = quote[0].indexOf(article)
+                                val distractors = generateDistractors(article)
+                                return Sentence(quote[0].substring(0, index), article, quote[0].substring(index + article.length), distractors, "${quote[1]}\nRetrieved via \"${article.capitalize()}\" in Wikiquote, Die freie Zitatsammlung.")
+                            }
+                        }
+                    }
+                    catch (ioException: IOException) {
+                        ioException.printStackTrace()
+                        continue
+                    }
+                }
+                else -> {
+                    // fallback for objects without text resources
+                    if(objects.containsKey(item.name) && objects.containsKey(item.name)) {
+                        val word = objects.getValue(item.name)
+                        val distractors = generateDistractors(word.accusative.article)
+                        return Sentence("Das ist", word.nominative.article, word.nominative.noun, distractors, null)
+                    }
                 }
             }
-        }
-        catch (ioException: IOException) {
-            ioException.printStackTrace()
-        }
-
-        // fallback for objects without text resources
-        if(objects.containsKey(item.name) && objects.containsKey(item.name)) {
-            val word = objects.getValue(item.name)
-            val distractors = generateDistractors(word.accusative.article)
-            return Sentence("Das ist", word.accusative.article, word.accusative.noun, distractors)
         }
 
         return null
@@ -135,7 +179,7 @@ class SentenceManager(private val context: Context) {
         val wordToChoose = secondWord.accusative.article
         val secondPart = secondWord.accusative.noun
 
-        return Sentence(firstPart, wordToChoose, secondPart, generateDistractors(wordToChoose))
+        return Sentence(firstPart, wordToChoose, secondPart, generateDistractors(wordToChoose), null)
     }
 
     private fun createDativeSentence(firstWord: Word, secondWord: Word, position: String) : Sentence {
@@ -155,9 +199,9 @@ class SentenceManager(private val context: Context) {
                 if (it == "dem") "vom" else "von $it"
             } as ArrayList<String>
             // then remove "von" from the first part of the sentence
-            Sentence(firstPart.replace("von", ""), "vom", secondPart, distractors)
+            Sentence(firstPart.replace("von", ""), "vom", secondPart, distractors, null)
         } else {
-            Sentence(firstPart, wordToChoose, secondPart, distractors)
+            Sentence(firstPart, wordToChoose, secondPart, distractors, null)
         }
     }
 
@@ -178,5 +222,20 @@ class SentenceManager(private val context: Context) {
 
         return distractors
 
+    }
+
+    private fun getAssetFileName(name: String): String {
+        return name
+            .lowercase()
+            .replace("ä", "ae")
+            .replace("ö", "oe")
+            .replace("ü", "ue")
+            .replace("ß", "ss")
+    }
+
+    private enum class UseOptions {
+        USE_POSITION,
+        USE_NOVELS,
+        USE_QUOTES
     }
 }
