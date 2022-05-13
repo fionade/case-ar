@@ -15,7 +15,9 @@
             <androidx.camera.view.PreviewView
                 android:id="@+id/previewView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent" >
+
+            </androidx.camera.view.PreviewView>
         </FrameLayout>
 
         <LinearLayout
@@ -35,7 +37,7 @@
                 android:layout_marginEnd="@dimen/fab_layout_margin"
                 android:layout_gravity="bottom" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/quizContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,15 +48,18 @@
                     android:id="@+id/part1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:singleSelection="true"
                     android:textSize="@dimen/medium_font_size"
                     android:text="Der Hund steht neben" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/options"
-                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/part1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
@@ -77,7 +82,7 @@
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="dem" />
+                        android:text="der" />
 
                 </com.google.android.material.chip.ChipGroup>
 
@@ -85,7 +90,9 @@
                     android:id="@+id/part2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/options"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     android:gravity="center_horizontal"
                     android:textSize="@dimen/medium_font_size"
                     android:text="Katze" />
@@ -94,10 +101,37 @@
                     android:id="@+id/attribution"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/part2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     android:gravity="center_horizontal"/>
 
-            </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/tickmark"
+                    android:alpha="0"
+                    app:tint="@color/colorAnswerCorrect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_margin="@dimen/default_padding"
+                    android:src="@drawable/ic_baseline_check_24"
+                    android:contentDescription="@string/correct" />
+
+                <ImageView
+                    android:id="@+id/incorrectmark"
+                    android:alpha="0"
+                    app:tint="@color/colorAnswerCorrect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_margin="@dimen/default_padding"
+                    android:src="@drawable/ic_baseline_close_24"
+                    android:contentDescription="@string/incorrect" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

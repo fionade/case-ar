@@ -26,6 +26,11 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
     private val firebaseLogger = FirebaseLogger.getInstance()
 
     fun addObject(detectedObject: DetectedObject) {
+
+        if (sentence.value != null) {
+            reset()
+        }
+
         preparationList.value?.add(detectedObject)
         // set the list as value so observers are notified
         preparationList.value = preparationList.value

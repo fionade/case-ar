@@ -27,6 +27,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.*
+import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getColorStateList
@@ -146,18 +147,17 @@ class CameraFragment: Fragment() {
         }
 
         // The start button is only visible if at least one label has been selected
-        viewModel.preparationList.observe(viewLifecycleOwner, {
+        viewModel.preparationList.observe(viewLifecycleOwner) {
             if (it != null && it.size > 0 && viewModel.sentence.value == null) {
                 binding.startQuiz.visibility = View.VISIBLE
                 binding.startQuiz.show()
-            }
-            else {
+            } else {
                 binding.startQuiz.visibility = View.GONE
             }
-        })
+        }
 
         // Show a quiz once it's available
-        viewModel.sentence.observe(viewLifecycleOwner, {
+        viewModel.sentence.observe(viewLifecycleOwner) {
             // set the sentence and show the quiz
             if (it != null) {
                 showQuiz(it)
@@ -168,7 +168,7 @@ class CameraFragment: Fragment() {
             else {
                 resetQuiz()
             }
-        })
+        }
 
         optionList = arrayOf(binding.option1, binding.option2, binding.option3)
         optionList.forEach { it ->
@@ -289,6 +289,9 @@ class CameraFragment: Fragment() {
 
         binding.quizContainer.visibility = View.GONE
 //        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+
+        binding.tickmark.alpha = 0f
+        binding.incorrectmark.alpha = 0f
     }
 
     private fun onOptionSelected(view: View) {
@@ -305,6 +308,11 @@ class CameraFragment: Fragment() {
                 it.isCheckable = false
             }
 
+            binding.incorrectmark.animate().alpha(0f).setDuration(100)
+                .setInterpolator(AccelerateInterpolator()).start()
+            binding.tickmark.animate().alpha(1f).setDuration(800)
+                .setInterpolator(AccelerateInterpolator()).start()
+
             binding.quizContainer.postDelayed({
                 if (_binding != null) {
                     viewModel.reset()
@@ -314,6 +322,9 @@ class CameraFragment: Fragment() {
         else {
 
             chip.setChipBackgroundColorResource(R.color.colorAnswerIncorrect)
+
+            binding.incorrectmark.animate().alpha(1f).setDuration(800)
+                .setInterpolator(AccelerateInterpolator()).start()
 
             // cannot be selected twice
             chip.isCheckable = false

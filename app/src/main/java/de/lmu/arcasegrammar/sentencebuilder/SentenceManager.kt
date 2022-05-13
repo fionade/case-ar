@@ -24,6 +24,8 @@ import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -88,13 +90,7 @@ class SentenceManager(private val context: Context) {
                         // choose random line
                         val sentence = lines[Random.nextInt(lines.size)]
 
-                        for (article in SOLUTION_OPTIONS) {
-                            if (sentence.contains(" $article ") || sentence.contains("${article.capitalize()} ")) { // articles within a word are not accepted.
-                                val index = sentence.indexOf(article)
-                                val distractors = generateDistractors(article)
-                                return Sentence(sentence.substring(0, index), article, sentence.substring(index + article.length), distractors, null)
-                            }
-                        }
+                        return generateQuestion(sentence)
                     }
                     catch (ioException: IOException) {
                         ioException.printStackTrace()
@@ -113,13 +109,12 @@ class SentenceManager(private val context: Context) {
                         // choose random line
                         val quote = entries[Random.nextInt(entries.size)]
 
-                        for (article in SOLUTION_OPTIONS) {
-                            if (quote.size == 2 && (quote[0].contains("$article ") || quote[0].contains("${article.capitalize()} "))) { // articles within a word are not accepted.
-                                val index = quote[0].indexOf(article)
-                                val distractors = generateDistractors(article)
-                                return Sentence(quote[0].substring(0, index), article, quote[0].substring(index + article.length), distractors, "${quote[1]}\nRetrieved via \"${article.capitalize()}\" in Wikiquote, Die freie Zitatsammlung.")
-                            }
+                        if (quote.size == 2) {
+                            val sentence = generateQuestion(quote[0])
+                            sentence?.let { it.attribution = "${quote[1]}\nin Wikiquote, Die freie Zitatsammlung." }
+                            return sentence
                         }
+
                     }
                     catch (ioException: IOException) {
                         ioException.printStackTrace()
@@ -130,13 +125,38 @@ class SentenceManager(private val context: Context) {
                     // fallback for objects without text resources
                     if(objects.containsKey(item.name) && objects.containsKey(item.name)) {
                         val word = objects.getValue(item.name)
-                        val distractors = generateDistractors(word.accusative.article)
+                        val distractors = generateDistractors(word.nominative.article)
                         return Sentence("Das ist", word.nominative.article, word.nominative.noun, distractors, null)
                     }
                 }
             }
         }
 
+        return null
+    }
+
+    private fun generateQuestion(sentence: String): Sentence? {
+
+        SOLUTION_OPTIONS.shuffle()
+
+        for (article in SOLUTION_OPTIONS) {
+
+            // does the sentence contain any of the articles?
+            if (sentence.contains(" $article ") ||
+                sentence.contains("${article.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                }} ")) { // articles within a word are not accepted.
+                val index = sentence.indexOf(article)
+
+                // ignore cases where an article is found within a word, e.g. "Bruder"
+                if (index == 0 || !sentence[index-1].isLetter()) {
+                    val distractors = generateDistractors(article)
+                    return Sentence(sentence.substring(0, index), article, sentence.substring(index + article.length), distractors, null)
+                }
+            }
+        }
         return null
     }
 
