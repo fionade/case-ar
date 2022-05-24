@@ -27,8 +27,8 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.*
-import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getColorStateList
 import androidx.camera.core.CameraSelector
@@ -36,6 +36,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -47,20 +48,24 @@ import com.google.common.util.concurrent.ListenableFuture
 import de.lmu.arcasegrammar.databinding.FragmentCameraBinding
 import de.lmu.arcasegrammar.logging.FirebaseLogger
 import de.lmu.arcasegrammar.model.DetectedObject
+import de.lmu.arcasegrammar.model.QuizWrapper
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 import de.lmu.arcasegrammar.tensorflow.YuvToRgbConverter
 import de.lmu.arcasegrammar.tensorflow.tflite.Classifier
 import de.lmu.arcasegrammar.tensorflow.tflite.TFLiteObjectDetectionAPIModel
+import de.lmu.arcasegrammar.viewhelpers.ChoiceQuizLayout
+import de.lmu.arcasegrammar.viewhelpers.QuizLayout
 import de.lmu.arcasegrammar.viewmodel.DetectionViewModel
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.collections.HashMap
+import kotlin.reflect.typeOf
 
 typealias ObjectListener = (objects: List<Classifier.Recognition>) -> Unit
 
-class CameraFragment: Fragment() {
+class CameraFragment: Fragment(), QuizLayout.QuizLayoutResponder {
 
     companion object {
         const val TAG = "CameraFragment"
@@ -78,8 +83,8 @@ class CameraFragment: Fragment() {
     }
 
     // Quiz setup
-    private lateinit var optionList: Array<Chip>
     private lateinit var bottomSheet: BottomSheetBehavior<LinearLayout>
+    private var quizView: QuizLayout? = null
 
     // Tensorflow setup
     private lateinit var detector: Classifier
@@ -148,7 +153,7 @@ class CameraFragment: Fragment() {
 
         // The start button is only visible if at least one label has been selected
         viewModel.preparationList.observe(viewLifecycleOwner) {
-            if (it != null && it.size > 0 && viewModel.sentence.value == null) {
+            if (it != null && it.size > 0 && viewModel.quiz.value == null) {
                 binding.startQuiz.visibility = View.VISIBLE
                 binding.startQuiz.show()
             } else {
@@ -157,7 +162,7 @@ class CameraFragment: Fragment() {
         }
 
         // Show a quiz once it's available
-        viewModel.sentence.observe(viewLifecycleOwner) {
+        viewModel.quiz.observe(viewLifecycleOwner) {
             // set the sentence and show the quiz
             if (it != null) {
                 showQuiz(it)
@@ -168,11 +173,6 @@ class CameraFragment: Fragment() {
             else {
                 resetQuiz()
             }
-        }
-
-        optionList = arrayOf(binding.option1, binding.option2, binding.option3)
-        optionList.forEach { it ->
-            it.setOnClickListener {onOptionSelected(it) }
         }
 
         // check camera permission
@@ -253,86 +253,36 @@ class CameraFragment: Fragment() {
     }
 
 
-    private fun showQuiz(sentence: Sentence) {
+    private fun showQuiz(quiz: QuizWrapper) {
 
         binding.optionChipGroup.removeAllViews()
 
         // remove all checked labels from the label list
         labelList = labelList.filter { !it.value.isChecked } as HashMap<String, Chip>
 
-        binding.part1.text = sentence.firstPart
-        binding.part2.text = sentence.secondPart
-        binding.attribution.text = sentence.attribution ?: ""
-
-        binding.option1.text = sentence.distractors[0]
-        binding.option2.text = sentence.distractors[1]
-        binding.option3.text = sentence.distractors[2]
-
-        firebaseLogger.addLogMessage("show_quiz", sentence.stringify())
-
-        binding.quizContainer.visibility = View.VISIBLE
+        // TODO: this is the position where you can change the quiz type
+        if (quiz is Sentence) {
+            quizView = ChoiceQuizLayout(requireContext(), quiz, this)
+            quizView?.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+            binding.optionContainer.addView(quizView)
+        }
 
     }
 
     private fun resetQuiz() {
-        // reset the radio group so no item is preselected on subsequent quizzes
-        binding.options.clearCheck()
-
-        optionList.forEach {
-            it.setChipBackgroundColorResource(R.color.colorOptionBackground)
-            it.setTextColor(getColorStateList(requireActivity(), R.color.chip_states))
-            it.isCheckable = true
-        }
 
         // remove all checked labels from the label list
         labelList = labelList.filter { !it.value.isChecked } as HashMap<String, Chip>
 
-        binding.quizContainer.visibility = View.GONE
-//        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-
-        binding.tickmark.alpha = 0f
-        binding.incorrectmark.alpha = 0f
+        binding.optionContainer.removeView(quizView)
+        quizView = null
     }
 
-    private fun onOptionSelected(view: View) {
-        val chip = view as Chip
-
-        if(view.text == viewModel.sentence.value?.wordToChoose) {
-            // correct solution found
-
-            firebaseLogger.addLogMessage("answer_selected", "correct: ${view.text}")
-
-            chip.setChipBackgroundColorResource(R.color.colorAnswerCorrect)
-
-            optionList.forEach {
-                it.isCheckable = false
-            }
-
-            binding.incorrectmark.animate().alpha(0f).setDuration(100)
-                .setInterpolator(AccelerateInterpolator()).start()
-            binding.tickmark.animate().alpha(1f).setDuration(800)
-                .setInterpolator(AccelerateInterpolator()).start()
-
-            binding.quizContainer.postDelayed({
-                if (_binding != null) {
-                    viewModel.reset()
-                }
-            }, 3000) // hide quiz 3 seconds after a correct answer
-        }
-        else {
-
-            chip.setChipBackgroundColorResource(R.color.colorAnswerIncorrect)
-
-            binding.incorrectmark.animate().alpha(1f).setDuration(800)
-                .setInterpolator(AccelerateInterpolator()).start()
-
-            // cannot be selected twice
-            chip.isCheckable = false
-
-            firebaseLogger.addLogMessage("answer_selected", "wrong: ${view.text}")
+    override fun reset() {
+        if (_binding != null) {
+            viewModel.reset()
         }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

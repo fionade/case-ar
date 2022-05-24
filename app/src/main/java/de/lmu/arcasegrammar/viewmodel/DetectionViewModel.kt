@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import de.lmu.arcasegrammar.logging.FirebaseLogger
 import de.lmu.arcasegrammar.model.DetectedObject
 import de.lmu.arcasegrammar.model.HistoryDatabase
+import de.lmu.arcasegrammar.model.QuizWrapper
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 import de.lmu.arcasegrammar.sentencebuilder.SentenceManager
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     // Quiz setup
     private var sentenceManager: SentenceManager = SentenceManager(application)
-    var sentence: MutableLiveData<Sentence?> = MutableLiveData(null)
+    var quiz: MutableLiveData<QuizWrapper?> = MutableLiveData(null)
 
     val preparationList: MutableLiveData<ArrayList<DetectedObject>> = MutableLiveData(ArrayList())
 
@@ -27,7 +28,7 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun addObject(detectedObject: DetectedObject) {
 
-        if (sentence.value != null) {
+        if (quiz.value != null) {
             reset()
         }
 
@@ -50,12 +51,13 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
         if (preparationList.value != null) {
             when {
                 preparationList.value!!.size == 1 -> {
-                    sentence.value = sentenceManager.constructSingleSentence(preparationList.value!![0])
+                    // TODO: dynamically change question type here
+                    quiz.value = sentenceManager.constructSingleSentence(preparationList.value!![0])
 
                 }
                 preparationList.value!!.size == 2 -> {
                     // construct sentence
-                    sentence.value = sentenceManager.constructSentence(
+                    quiz.value = sentenceManager.constructSentence(
                         preparationList.value!![0],
                         preparationList.value!![1]
                     )
@@ -63,7 +65,7 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
                 preparationList.value!!.size > 2 -> {
 
                     preparationList.value?.shuffle()
-                    sentence.value = sentenceManager.constructSentence(
+                    quiz.value = sentenceManager.constructSentence(
                         preparationList.value!![0],
                         preparationList.value!![1]
                     )
@@ -75,14 +77,18 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun reset() {
-        sentence.value = null
+        quiz.value = null
         preparationList.value = ArrayList()
     }
 
     private fun addToHistory() {
-        if (sentence.value != null) {
+        if (quiz.value != null) {
+
+            // TODO add other quiz types here
             viewModelScope.launch {
-                sentenceDao.insertSentence(sentence.value!!)
+                if (quiz.value!! is Sentence) {
+                    sentenceDao.insertSentence(quiz.value!! as Sentence)
+                }
             }
         }
     }
