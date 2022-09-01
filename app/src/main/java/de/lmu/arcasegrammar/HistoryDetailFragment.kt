@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import de.lmu.arcasegrammar.databinding.FragmentHistoryDetailBinding
+import de.lmu.arcasegrammar.sentencebuilder.Sentence
 import de.lmu.arcasegrammar.viewmodel.HistoryViewModel
 
 class HistoryDetailFragment : Fragment() {
@@ -14,8 +15,6 @@ class HistoryDetailFragment : Fragment() {
     // View binding
     private var _binding: FragmentHistoryDetailBinding? = null
     private val binding get() = _binding!!
-
-    private var sentenceId = 0L
 
     private val viewModel: HistoryViewModel by viewModels()
 
@@ -26,9 +25,9 @@ class HistoryDetailFragment : Fragment() {
     ): View? {
         _binding = FragmentHistoryDetailBinding.inflate(inflater, container, false)
 
-        viewModel.sentence.observe(viewLifecycleOwner, {
+        viewModel.quiz.observe(viewLifecycleOwner) {
             // set the sentence and show the quiz
-            if (it != null) {
+            if (it is Sentence) {
                 binding.detailFirstPart.text = it.firstPart
                 binding.detailSolution.text = it.wordToChoose
                 binding.detailSecondPart.text = it.secondPart
@@ -36,7 +35,9 @@ class HistoryDetailFragment : Fragment() {
                 binding.detailSolution.visibility = View.INVISIBLE
                 binding.showAnswerButton.visibility = View.VISIBLE
             }
-        })
+
+            // TODO: else adapt the display
+        }
 
         binding.showAnswerButton.setOnClickListener {
             if (binding.detailSolution.visibility == View.INVISIBLE) {
@@ -45,14 +46,9 @@ class HistoryDetailFragment : Fragment() {
             }
         }
 
-        arguments?.getLong("showSentence")?.let { it ->
-            sentenceId = it
-
-            if (sentenceId != -1L) {
-                // display this sentence
-
-                viewModel.getSentence(sentenceId)
-            }
+        arguments?.let {
+            val args = HistoryDetailFragmentArgs.fromBundle(it)
+            viewModel.getQuiz(args.quizId, args.quizType)
         }
 
         return binding.root

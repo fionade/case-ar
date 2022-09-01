@@ -10,6 +10,7 @@ import de.lmu.arcasegrammar.model.HistoryDatabase
 import de.lmu.arcasegrammar.model.QuizWrapper
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 import de.lmu.arcasegrammar.sentencebuilder.SentenceManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DetectionViewModel(application: Application) : AndroidViewModel(application) {
@@ -22,6 +23,7 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     // history
     private val sentenceDao = HistoryDatabase.getDatabase(application).sentenceDao()
+    // TODO add other Daos here
 
     // logging
     private val firebaseLogger = FirebaseLogger.getInstance()
@@ -85,7 +87,7 @@ class DetectionViewModel(application: Application) : AndroidViewModel(applicatio
         if (quiz.value != null) {
 
             // TODO add other quiz types here
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 if (quiz.value!! is Sentence) {
                     sentenceDao.insertSentence(quiz.value!! as Sentence)
                 }

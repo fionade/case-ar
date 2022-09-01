@@ -15,6 +15,7 @@
  */
 package de.lmu.arcasegrammar.sentencebuilder
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import de.lmu.arcasegrammar.model.QuizWrapper
 
@@ -23,15 +24,18 @@ data class Sentence(val firstPart: String,
                     val wordToChoose: String,
                     val secondPart: String,
                     val distractors: ArrayList<String>,
-                    var attribution: String?,
-                    @PrimaryKey(autoGenerate = true) var id: Long = 0): QuizWrapper() {
+                    var attribution: String?): QuizWrapper() {
 
-    fun stringify(): String {
+    override fun stringify(): String {
         return "%s %s %s.".format(firstPart, wordToChoose, secondPart)
     }
 
-    fun stringifyWithPlaceholder(): String {
+    override fun stringifyWithPlaceholder(): String {
         return "%s ... %s.".format(firstPart, secondPart)
+    }
+
+    override fun getQuizType(): QuizType {
+        return QuizType.Sentence
     }
 }
 

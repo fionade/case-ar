@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,10 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import de.lmu.arcasegrammar.databinding.FragmentHistoryBinding
-import de.lmu.arcasegrammar.model.HistoryDatabase
-import de.lmu.arcasegrammar.sentencebuilder.Sentence
-import de.lmu.arcasegrammar.sentencebuilder.SentenceDao
+import de.lmu.arcasegrammar.model.QuizWrapper
 import de.lmu.arcasegrammar.viewhelpers.HistoryAdapter
+import de.lmu.arcasegrammar.viewmodel.HistoryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -32,8 +32,8 @@ class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
 
-    // Room database connection
-    private lateinit var sentenceDao: SentenceDao
+    // Room view model
+    private val viewModel: HistoryViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,11 +42,7 @@ class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
     ): View? {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
 
-        sentenceDao = HistoryDatabase.getDatabase(requireContext()).sentenceDao()
-        var sentenceList: MutableList<Sentence> = mutableListOf()
-
-
-        val historyAdapter = HistoryAdapter(sentenceList, this)
+        val historyAdapter = HistoryAdapter(mutableListOf(), this)
         binding.historyList.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = historyAdapter
@@ -54,19 +50,16 @@ class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
 
 
         // Loading initial data
-        lifecycleScope.launch(Dispatchers.IO) {
-            sentenceList = sentenceDao.getAllSentences() as MutableList<Sentence>
+        viewModel.getAllQuizzes()
 
-            lifecycleScope.launch(Dispatchers.Main) {
-                historyAdapter.setData(sentenceList)
+        viewModel.quizList.observe(viewLifecycleOwner) {
+
+            if (it.isNullOrEmpty()) {
+                binding.emptyListWarning.visibility = View.VISIBLE
+            } else {
+                historyAdapter.setData(it)
                 historyAdapter.notifyDataSetChanged()
-
-                if (sentenceList.size == 0) {
-                    binding.emptyListWarning.visibility = View.VISIBLE
-                }
-                else {
-                    binding.emptyListWarning.visibility = View.GONE
-                }
+                binding.emptyListWarning.visibility = View.GONE
             }
         }
 
@@ -89,13 +82,9 @@ class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
                 override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
                     // remove from adapter
                     val position = viewHolder.adapterPosition
-                    val sentenceToRemove = sentenceList[position]
-                    sentenceList.removeAt(position)
-
-                    historyAdapter.setData(sentenceList)
-                    historyAdapter.notifyItemRangeRemoved(viewHolder.adapterPosition, 1)
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        sentenceDao.deleteSentence(sentenceToRemove)
+                    val sentenceToRemove = viewModel.quizList.value?.get(position)
+                    if (sentenceToRemove != null) {
+                        viewModel.deleteQuiz(sentenceToRemove)
                     }
                 }
 
@@ -138,9 +127,12 @@ class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
         _binding = null
     }
 
-    override fun onItemTouched(id: Long) {
-        val bundle = bundleOf("showSentence" to id)
-        findNavController().navigate(R.id.navigation_history_to_detail, bundle)
+    override fun onItemTouched(id: Long, quizType: QuizWrapper.QuizType) {
+//        val bundle = bundleOf("quizId" to id, "quizType" to "Sentence")
+        val action = HistoryFragmentDirections.actionNavigationHistoryToNavigationHistoryDetail()
+        action.quizId = id
+        action.quizType = quizType
+        findNavController().navigate(action)
     }
 
 }

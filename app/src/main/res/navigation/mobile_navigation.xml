@@ -9,19 +9,48 @@
         android:id="@+id/navigation_home"
         android:name="de.lmu.arcasegrammar.CameraFragment"
         android:label="@string/camera"
-        tools:layout="@layout/fragment_camera" />
+        tools:layout="@layout/fragment_camera" >
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_history"
+            app:destination="@id/navigation_history" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_prefs_info"
+            app:destination="@id/navigation_prefs_info" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_history"
         android:name="de.lmu.arcasegrammar.HistoryFragment"
         android:label="@string/history_title"
-        tools:layout="@layout/fragment_history" />
+        tools:layout="@layout/fragment_history" >
+        <action
+            android:id="@+id/action_navigation_history_to_navigation_history_detail"
+            app:destination="@id/navigation_history_detail">
+            <argument
+                android:name="quizId"
+                app:argType="long"
+                android:defaultValue="-1L" />
+            <argument
+                android:name="quizType"
+                app:argType="de.lmu.arcasegrammar.model.QuizWrapper$QuizType"
+                android:defaultValue="Sentence" />
+        </action>
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_history_to_detail"
+        android:id="@+id/navigation_history_detail"
         android:name="de.lmu.arcasegrammar.HistoryDetailFragment"
         android:label="@string/history_detail_title"
-        tools:layout="@layout/fragment_history_detail" />
+        tools:layout="@layout/fragment_history_detail" >
+        <argument
+            android:name="quizId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+        <argument
+            android:name="quizType"
+            app:argType="de.lmu.arcasegrammar.model.QuizWrapper$QuizType"
+            android:defaultValue="Sentence" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_info"

@@ -3,7 +3,6 @@ package de.lmu.arcasegrammar.viewhelpers
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.chip.Chip

@@ -10,6 +10,7 @@ import de.lmu.arcasegrammar.sentencebuilder.SentenceDao
 abstract class HistoryDatabase : RoomDatabase() {
 
     abstract fun sentenceDao(): SentenceDao
+    // TODO: add additional QuizWrapperDaos here
 
     companion object {
         @Volatile

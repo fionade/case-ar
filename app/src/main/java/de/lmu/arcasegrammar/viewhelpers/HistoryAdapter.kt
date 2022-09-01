@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.lmu.arcasegrammar.R
+import de.lmu.arcasegrammar.model.QuizWrapper
 import de.lmu.arcasegrammar.sentencebuilder.Sentence
 
-class HistoryAdapter(private var sentenceList: List<Sentence>, private val listener: SentenceTouchListener) : RecyclerView.Adapter<HistoryAdapter.MyViewHolder>() {
+class HistoryAdapter(private var sentenceList: List<QuizWrapper>, private val listener: SentenceTouchListener) : RecyclerView.Adapter<HistoryAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -18,7 +19,7 @@ class HistoryAdapter(private var sentenceList: List<Sentence>, private val liste
         holder.quizTitle.text = sentenceList[position].stringifyWithPlaceholder()
 
         holder.itemView.setOnClickListener {
-            listener.onItemTouched(sentenceList[position].id)
+            listener.onItemTouched(sentenceList[position].id, sentenceList[position].getQuizType())
         }
     }
 
@@ -26,7 +27,7 @@ class HistoryAdapter(private var sentenceList: List<Sentence>, private val liste
         return sentenceList.size
     }
 
-    fun setData(sentenceList: List<Sentence>) {
+    fun setData(sentenceList: List<QuizWrapper>) {
         this.sentenceList = sentenceList
     }
 
@@ -38,6 +39,6 @@ class HistoryAdapter(private var sentenceList: List<Sentence>, private val liste
     }
 
     interface SentenceTouchListener {
-        fun onItemTouched(id: Long)
+        fun onItemTouched(id: Long, quizType: QuizWrapper.QuizType)
     }
 }
