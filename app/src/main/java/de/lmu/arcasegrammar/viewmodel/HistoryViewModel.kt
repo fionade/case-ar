@@ -18,27 +18,6 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     // current quiz
     var quiz: MutableLiveData<QuizWrapper> = MutableLiveData(null)
     var quizList: MutableLiveData<List<QuizWrapper>> = MutableLiveData(null)
-//    private var sentence: LiveData<Sentence> = MutableLiveData(null)
-//    private var sentenceList: LiveData<List<Sentence>> = MutableLiveData(null)
-//    // TODO create lists for other quiz types
-
-//    private val sentenceObserver = Observer<Sentence> {
-//        quiz.value = sentence.value
-//    }
-//    private val sentenceListObserver = Observer<List<Sentence>> {
-//        quizList.value = sentenceList.value
-//    }
-//    // TODO add additional observers for other data types
-//
-//    init {
-//        sentence.observeForever(sentenceObserver)
-//        sentenceList.observeForever (sentenceListObserver)
-//    }
-//
-//    override fun onCleared() {
-//        sentence.removeObserver(sentenceObserver)
-//        sentenceList.removeObserver(sentenceListObserver)
-//    }
 
     fun getQuiz(id: Long, quizType: QuizWrapper.QuizType) {
 

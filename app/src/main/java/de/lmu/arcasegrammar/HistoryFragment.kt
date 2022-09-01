@@ -57,7 +57,7 @@ class HistoryFragment : Fragment(), HistoryAdapter.SentenceTouchListener {
             if (it.isNullOrEmpty()) {
                 binding.emptyListWarning.visibility = View.VISIBLE
             } else {
-                historyAdapter.setData(it)
+                historyAdapter.setData(it.sortedWith(compareBy {item -> - item.timestamp }))
                 historyAdapter.notifyDataSetChanged()
                 binding.emptyListWarning.visibility = View.GONE
             }
